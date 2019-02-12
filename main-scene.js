@@ -1,8 +1,3 @@
-class object_3d {
-    
-}
-
-
 class Assignment_One_Scene extends Scene_Component {
     // The scene begins by requesting the camera, shapes, and materials it will need.
     constructor(context, control_box) {
@@ -49,8 +44,6 @@ class Assignment_One_Scene extends Scene_Component {
         this.brown = Color.of(.4, .3, .25, 1);
         this.orange = Color.of(1, .7, 0, 1);
         this.white = Color.of(1, 1, .8, 1);
-
-        this.t = 0;
     }
 
 
@@ -144,11 +137,12 @@ class Assignment_One_Scene extends Scene_Component {
             this.t += graphics_state.animation_delta_time / 1000;
         const t = this.t;
 
-        
-        
         var T; var R; var S; var M;
 
         this.draw_axes(graphics_state, 12);
+
+        var bfv = new BranchingFeatureVector(5);
+
 
     }
 }
