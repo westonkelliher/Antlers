@@ -3,19 +3,21 @@ class BranchingFeatureVector {
     // a null features means this BFV represents a value
     // a valid features means this BFV represents a feature vector
     constructor(x) {
-    	console.log(typeof(x));
-	if (typeof(x) != 'number' && typeof(x) != 'array') {
-	    throw "BFV must be constructed with number or array"
+	if (typeof(x) == 'number') {
+	    this.value = x;
 	}
-	this.value = x;
+	else if (Array.isArray(x)){
+	    this.value = [];
+	    for (let i = 0; i < x.length; i++) {
+		this.add(new BranchingFeatureVector(x[i]));
+	    }
+	}
+	else
+	    throw "attempt to construct BFV with value other than number or array"
     }
 
     is_value() {
 	return typeof(this.value) == 'number';
-    }
-
-    is_vector() {
-	return typeof(this.value) == 'array';
     }
 
     
@@ -26,12 +28,6 @@ class BranchingFeatureVector {
     }
     
 
-    get_feature(i) {
-	if (typeof(this.value) != 'array')
-	    throw "BFV treated as feature vector when it is a value";
-	return this.vector[i];
-    }
-
     add(x) {
 	if (this.is_value())
 	    throw "cannot element to value";
@@ -39,15 +35,12 @@ class BranchingFeatureVector {
     }
 
     multiply_by(x) {
-	if (this.is_end) {
-	    //do nothing
-	}
-	else if (this.is_value()) {
+	if (this.is_value()) {
 	    this.value *= x;
 	}
-	else if (this.is_vector()) {
-	    for (let i in this.value) {
-		i.multiply_by(x);
+	else {
+	    for (let i = 0; i < this.value.length; i++) {
+		this.value[i].multiply_by(x);
 	    }
 	}
     }
@@ -57,14 +50,28 @@ class BranchingFeatureVector {
 	if (this.is_value()) {
 	     BFV = new BranchingFeatureVector(this.value);
 	}
-	else if (this.is_vector()) {
+	else {
 	    BFV = new BranchingFeatureVector([]);
-	    for (let i in this.value) {
-		BFV.add(i.copy());
+	    for (let i = 0; i < this.value.length; i++) {
+		BFV.add(this.value[i].copy());
 	    }
 	}
 	return BFV;
     }
-    
+
+    to_string() {
+	var sumstr = "";
+	if (this.is_value()) {
+	    sumstr = this.value.toString();
+	}
+	else {
+	    sumstr = "v(";
+	    for (let i = 0; i < this.value.length; i++) {
+		sumstr += " "+this.value[i].to_string();
+	    }
+	    sumstr += " )";
+	}
+	return sumstr;
+    }
 }
 

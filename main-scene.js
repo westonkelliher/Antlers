@@ -44,6 +44,20 @@ class Assignment_One_Scene extends Scene_Component {
         this.brown = Color.of(.4, .3, .25, 1);
         this.orange = Color.of(1, .7, 0, 1);
         this.white = Color.of(1, 1, .8, 1);
+
+
+
+
+        //temp
+
+        var bfv1 = new BranchingFeatureVector(5);
+        var bfv2 = new BranchingFeatureVector([5, [13, 7], 2, 3]);
+        var bfv3 = bfv2.copy();
+        bfv3.multiply_by(.7);
+        
+        console.log(bfv1.to_string());
+        console.log(bfv2.to_string());
+        console.log(bfv3.to_string());
     }
 
 
@@ -141,7 +155,6 @@ class Assignment_One_Scene extends Scene_Component {
 
         this.draw_axes(graphics_state, 12);
 
-        var bfv = new BranchingFeatureVector(5);
 
 
     }
