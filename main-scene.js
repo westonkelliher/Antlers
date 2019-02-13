@@ -53,22 +53,23 @@ class Assignment_One_Scene extends Scene_Component {
         this.t = 0;
 
 
-        var spike0 = new TreeSpike(Math.PI*0, 1, Math.PI*0, Math.pi*1/4);
-        var segA1 = new TreeSegment(Math.PI*0, 2, Math.PI*0, Math.pi*0, .9, Math.PI*0, Math.pi*1/8);
-        var branchA2 = new TreeBranch(.4, .8);
-        var segA2 = new TreeSegment(Math.PI*0, 2, Math.PI*1, Math.pi*1/4, .6, Math.PI*1, Math.pi*1/11);
+        var spike0 = new TreeSpike(Math.PI*0, 4, Math.PI*0, Math.PI*0);
+        var segA1 = new TreeSegment(Math.PI*5/23, 3, Math.PI*0, Math.PI*0, .9, Math.PI*0, Math.PI*1/8);
+        var branchA2 = new TreeBranch(.4, Math.PI*0, .95);
+        var segA2 = new TreeSegment(Math.PI*0, 4, Math.PI*1, Math.PI*1/4, .7, Math.PI*1, Math.PI*1/11);
         var openA2 = new TreeOpenning();
         var branch_endA2 = new TreeBranchEnd();
-        var segA3 = new TreeSegment(Math.PI*1/7, 2, Math.PI*0, Math.pi*0, .9, Math.PI*1, Math.pi*1/9);
+        var segA3 = new TreeSegment(Math.PI*1/7, 4, Math.PI*0, Math.PI*0, .7, Math.PI*1, Math.PI*2/9);
         var openA3 = new TreeOpenning();
 
         var rule1 = new TreeProductionRule(1, [segA1, branchA2, segA2, openA2, branch_endA2, segA3, openA3]);
 
         var tree_prod = new TreeProduction(spike0);
-        tree_prod.add_rule(.2, rule1);
+        tree_prod.add_rule(.1, rule1);
 
         var tree = tree_prod.generate_tree(1);
         console.log(tree.to_string());
+        this.tree_prod = tree_prod;
     }
 
 
@@ -124,32 +125,6 @@ class Assignment_One_Scene extends Scene_Component {
         this.shapes.box.draw(graphics_state, M, this.clay.override({color: this.dull_blue})); // -z
     }
 
-
-    draw_segment(seg, m) {
-        seg.draw(this.GS, m, this.clay.override({color: this.white}));
-    }
-
-    get_segment_matrix(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
-        var end_tilt = Mat4.rotation(end_phi, Vec.of(Math.cos(end_theta+Math.PI*1/2), Math.sin(end_theta+Math.PI*1/2), 0));
-        var lengthwise_tilt = Mat4.rotation(base_phi, Vec.of(Math.cos(base_theta+Math.PI*1/2), Math.sin(base_theta+Math.PI*1/2), 0));
-        var length_T = Mat4.translation(Vec.of(0, 0, base_length));
-        var end_S = Mat4.scale(Vec.of(end_size, end_size, end_size));
-        return Mat4.identity().times(lengthwise_tilt).times(length_T).times(end_tilt).times(end_S);
-    }
-
-    create_segment(m) {
-        var seg = new Segment(m);
-        seg.copy_onto_graphics_card(this.cont.gl);
-        return seg;
-    }
-
-    create_spike(m) {
-        var spike = new Spike(m);
-        spike.copy_onto_graphics_card(this.cont.gl);
-        return spike;
-    }
-
-
     display(graphics_state) {
         this.GS = graphics_state;
         graphics_state.lights = this.lights;
@@ -167,6 +142,10 @@ class Assignment_One_Scene extends Scene_Component {
         var T; var R; var S; var M;
 
         this.draw_axes(graphics_state, 12);
+
+
+        this.tree_prod.create_shapes(graphics_state, this.cont.gl, this.clay.override({color: this.white})); //TODO: do this once not every frame
+        this.tree_prod.draw_tree(1, graphics_state, m);
 
     }
 }
