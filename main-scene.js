@@ -51,6 +51,24 @@ class Assignment_One_Scene extends Scene_Component {
         this.white = Color.of(1, 1, .8, 1);
 
         this.t = 0;
+
+
+        var spike0 = new TreeSpike(Math.PI*0, 1, Math.PI*0, Math.pi*1/4);
+        var segA1 = new TreeSegment(Math.PI*0, 2, Math.PI*0, Math.pi*0, .9, Math.PI*0, Math.pi*1/8);
+        var branchA2 = new TreeBranch(.4, .8);
+        var segA2 = new TreeSegment(Math.PI*0, 2, Math.PI*1, Math.pi*1/4, .6, Math.PI*1, Math.pi*1/11);
+        var openA2 = new TreeOpenning();
+        var branch_endA2 = new TreeBranchEnd();
+        var segA3 = new TreeSegment(Math.PI*1/7, 2, Math.PI*0, Math.pi*0, .9, Math.PI*1, Math.pi*1/9);
+        var openA3 = new TreeOpenning();
+
+        var rule1 = new TreeProductionRule(1, [segA1, branchA2, segA2, openA2, branch_endA2, segA3, openA3]);
+
+        var tree_prod = new TreeProduction(spike0);
+        tree_prod.add_rule(.2, rule1);
+
+        var tree = tree_prod.generate_tree(1);
+        console.log(tree.to_string());
     }
 
 

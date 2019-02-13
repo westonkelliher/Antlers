@@ -9,7 +9,7 @@ class TreePart {
     }
 }
 
-class TreeSpike extends TreePart{
+class TreeSpike extends TreePart {
     constructor(base_rotation, base_length, base_theta, base_phi) {
 	super('v');
 	this.base_rotation = base_rotation;
@@ -20,7 +20,7 @@ class TreeSpike extends TreePart{
     
 }
 
-class TreeSegment {
+class TreeSegment extends TreePart {
     constructor(base_rotation, base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	super('I');
 	this.base_rotation = base_rotation;
@@ -33,7 +33,7 @@ class TreeSegment {
     }
 }
 
-class TreeBranch {
+class TreeBranch extends TreePart {
     constructor(branch_point, size_ratio) {
 	super('L(');
 	this.branch_point = branch_point; //where along the parent branch the next branch starts
@@ -41,13 +41,13 @@ class TreeBranch {
     }
 }
 
-class TreeEndBranch {
+class TreeBranchEnd extends TreePart {
     constructor() {
 	super(')');
     }
 }
 
-class TreeOpenning {
+class TreeOpenning extends TreePart {
     constructor() {
 	super('O');
     }
@@ -65,7 +65,7 @@ class TreeProductionRule {
 //rules should increase in max_size from left to right
 class TreeProduction {
     constructor(base_spike) {
-	this.rules = [new TreeProductionRule(1, [base_spike]));
+	this.rules = [new TreeProductionRule(1, [base_spike])];
     }
 
     add_rule(min_size, rule) {
@@ -76,30 +76,53 @@ class TreeProduction {
     generate_tree(size) {
 	var production = [];
 	var size_stack = [];
-	for (let i = 0; i <this.rules.length; i--) {
-	    if (size < this.rules[i].max_size) {
+	for (let i = 0; i < this.rules.length; i++) {
+	    if (size <= this.rules[i].max_size) {
 		for (let j = 0; j < this.rules[i].left_hand.length; j++) {
-		    if (j.to_string() == 'I') {
-			size *= j.end_size;
+		    var k = this.rules[i].left_hand[j];
+		    if (k.to_string() == 'I') {
+			size *= k.end_size;
+			production.push(k);
 		    }
-		    else if (j.to_string() == 'L(') {
+		    else if (k.to_string() == 'L(') {
 			size_stack.push(size);
-			size *= j.size_ratio;
+			size *= k.size_ratio;
+			production.push(k);
 		    }
-		    else if (j.to_string() == ')') {
+		    else if (k.to_string() == ')') {
 			size = size_stack.pop();
+			production.push(k);
 		    }
-		    else if (j.to_string() == 'O') {
-			generate_tree(size);
+		    else if (k.to_string() == 'O') {
+			production = production.concat(this.generate_tree(size));
+		    }
+		    else if (k.to_string() == 'v') {
+			size = 0;
+			production.push(k);
 		    }
 		}
 		break;
 	    }
 	}
+	return new Tree(production);
     }
+
     
 }
 
 class Tree {
 
+    constructor(tree_parts) {
+	this.tree_parts = tree_parts;
+    }
+
+    to_string() {
+	console.log(this.tree_parts);
+	var sumstr = "";
+	for (let i = 0; i < this.tree_parts.length; i++) {
+	    sumstr += this.tree_parts[i].to_string()+" ";
+	}
+	sumstr = sumstr.slice(0, -1);
+	return sumstr;
+    }
 }
