@@ -53,19 +53,43 @@ class Assignment_One_Scene extends Scene_Component {
         this.t = 0;
 
 
-        var spike0 = new TreeSpike(Math.PI*0, 4, Math.PI*0, Math.PI*0);
-        var segA1 = new TreeSegment(Math.PI*5/23, 3, Math.PI*0, Math.PI*0, .9, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new TreeBranch(.4, Math.PI*0, .95);
-        var segA2 = new TreeSegment(Math.PI*0, 4, Math.PI*1, Math.PI*1/4, .7, Math.PI*1, Math.PI*1/11);
-        var openA2 = new TreeOpenning();
-        var branch_endA2 = new TreeBranchEnd();
-        var segA3 = new TreeSegment(Math.PI*1/7, 4, Math.PI*0, Math.PI*0, .7, Math.PI*1, Math.PI*2/9);
-        var openA3 = new TreeOpenning();
 
-        var rule1 = new TreeProductionRule(1, [segA1, branchA2, segA2, openA2, branch_endA2, segA3, openA3]);
+        var open = new TreeOpenning();
+        var end = new TreeBranchEnd();
+        
+        var spike0 = new TreeSpike(Math.PI*0, 6, Math.PI*0, -Math.PI*1/8);
+        
+        var segA1 = new TreeSegment(Math.PI*21/23, 4, Math.PI*0, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
+        var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
+        var segA2 = new TreeSegment(Math.PI*0, 3, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
+        //openA2
+        //endA2
+        var segA3 = new TreeSegment(Math.PI*10/7, 5, Math.PI*0, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
+        //openA3
+        var ruleA = new TreeProductionRule(1, [branchA2, segA2, open, end, segA1, segA3, open]);
 
+        var branchB1 = new TreeBranch(0, Math.PI*0, .69);
+        var branchB2 = new TreeBranch(0, Math.PI*2/5, .7);
+        var branchB3 = new TreeBranch(0, Math.PI*4/5, .71);
+        var branchB4 = new TreeBranch(0, Math.PI*6/5, .73);
+        var branchB5 = new TreeBranch(0, Math.PI*8/5, .72);
+
+        var segC1 = new TreeSegment(Math.PI*1/20, 4, Math.PI*0, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
+        var segC2 = new TreeSegment(Math.PI*-1/15, 4, Math.PI*0, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
+        
+        
+        var ruleB = new TreeProductionRule(1, [branchB1, open, end, branchB2, open, end, 
+                                            branchB3, open, end, branchB4, open, end, branchB5, open, end])
+
+        var ruleC = new TreeProductionRule(1, [segC1, segC2, open]);
+
+        var ruleD = new TreeProductionRule(1, [segC1, open]);
+        
         var tree_prod = new TreeProduction(spike0);
-        tree_prod.add_rule(.1, rule1);
+        tree_prod.add_rule(.5*.75*.63*.85, ruleD);
+        tree_prod.add_rule(.5*.75*.63, ruleC);
+        tree_prod.add_rule(.5*.75, ruleB);
+        tree_prod.add_rule(.5, ruleA);
 
         var tree = tree_prod.generate_tree(1);
         console.log(tree.to_string());
