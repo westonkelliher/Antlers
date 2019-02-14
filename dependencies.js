@@ -100,16 +100,13 @@ window.MultiShape = window.classes.MultiShape = class MultiShape extends Shape {
 
         for (let p = 0; p < shapes.length; p++) {
             var M = shapes[p][0];
-            console.log(M.toString());
             var shape = shapes[p][1];
 
             for (let i = 0; i < shape.positions.length; i++) {
-                //console.log(Vec.of(...shape.positions[i]));
                 this.positions.push( M.times(Vec.of(...shape.positions[i], 1)).to3() );
                 this.normals.push( M.times(Vec.of(...shape.normals[i])).to3() );
             }
             for (let i = 0; i < shape.indices.length; i++) {
-                //console.log(shape.indices[i]+indice_offset);
                 this.indices.push(shape.indices[i]+indice_offset);
             }
             indice_offset += shape.positions.length;
