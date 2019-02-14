@@ -74,26 +74,46 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
         this.normals.push([0, 0, -1]);
         for (let i = 0; i < n; i++) {
             this.positions.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
-            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), -1]);
+            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
             //this.indices.push(0, i+1, i == n-1 ? 1 : i+2);
         }
 
-        this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
-        this.normals.push(m.times(Vec.of(0, 0, 1, 1)).to3() );
         for (let i = 0; i < n; i++) {
             this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
-            this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
+            this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 0)).to3());
             //this.indices.push(n+1, i+n+2, i == n-1 ? n+2 : i+n+3);
         }
 
         for (let i = 0; i < n; i++) {
-            this.indices.push(i+1, i == n-1 ? 1 : i+2, i+n+2);
-            this.indices.push(i+n+2, i == n-1 ? n+2 : i+n+3, i == n-1 ? 1 : i+2);
+            this.indices.push(i+1, i == n-1 ? 1 : i+2, i+n+1);
+            this.indices.push(i+n+1, i == n-1 ? n+2 : i+n+2, i == n-1 ? 1 : i+2);
         }
 
-        // calculate normals
-        // for each plane given by indices[i],[i+1],[i+2] 
-        // TODO
+    }
+}
+
+window.MultiShape = window.classes.MultiShape = class MultiShape extends Shape {
+    constructor(shapes) {   //[M1, Shape1], [M2, Shape2], ... 
+        super("positions", "normals");
+        
+        var indice_offset = 0;
+
+        for (let p = 0; p < shapes.length; p++) {
+            var M = shapes[p][0];
+            console.log(M.toString());
+            var shape = shapes[p][1];
+
+            for (let i = 0; i < shape.positions.length; i++) {
+                //console.log(Vec.of(...shape.positions[i]));
+                this.positions.push( M.times(Vec.of(...shape.positions[i], 1)).to3() );
+                this.normals.push( M.times(Vec.of(...shape.normals[i])).to3() );
+            }
+            for (let i = 0; i < shape.indices.length; i++) {
+                //console.log(shape.indices[i]+indice_offset);
+                this.indices.push(shape.indices[i]+indice_offset);
+            }
+            indice_offset += shape.positions.length;
+        }
 
     }
 }
