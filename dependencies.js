@@ -86,7 +86,7 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
 
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, i+n+1);
-            this.indices.push(i+n+1, i == n-1 ? n+2 : i+n+2, i == n-1 ? 1 : i+2);
+            this.indices.push(i+n+1, i == n-1 ? n+1 : i+n+2, i == n-1 ? 1 : i+2);
         }
 
     }
@@ -125,12 +125,12 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
         this.normals.push([0, 0, -1]);
         for (let i = 0; i < n; i++) {
             this.positions.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
-            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), -1]);
+            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
             this.indices.push(0, i+1, i == n-1 ? 1 : i+2);
         }
 
         this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
-        this.normals.push(m.times(Vec.of(0, 0, 1, 1)).to3() );
+        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
         
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, n+1);
