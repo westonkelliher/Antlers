@@ -373,6 +373,7 @@ class Vertex_Buffer {
     // Optional arguments allow calling this again to overwrite some or all GPU buffers as needed.
     copy_onto_graphics_card(gl, selection_of_arrays = this.array_names, write_to_indices = true) {
         for (let n of selection_of_arrays) {
+            gl.deleteBuffer(this.array_names_mapping_to_WebGLBuffers[n]);
             let buffer = this.array_names_mapping_to_WebGLBuffers[n] = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, Mat.flatten_2D_to_1D(this[n]), gl.STATIC_DRAW);

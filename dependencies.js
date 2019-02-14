@@ -92,28 +92,6 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
     }
 }
 
-window.MultiShape = window.classes.MultiShape = class MultiShape extends Shape {
-    constructor(shapes) {   //[M1, Shape1], [M2, Shape2], ... 
-        super("positions", "normals");
-        
-        var indice_offset = 0;
-
-        for (let p = 0; p < shapes.length; p++) {
-            var M = shapes[p][0];
-            var shape = shapes[p][1];
-
-            for (let i = 0; i < shape.positions.length; i++) {
-                this.positions.push( M.times(Vec.of(...shape.positions[i], 1)).to3() );
-                this.normals.push( M.times(Vec.of(...shape.normals[i])).to3() );
-            }
-            for (let i = 0; i < shape.indices.length; i++) {
-                this.indices.push(shape.indices[i]+indice_offset);
-            }
-            indice_offset += shape.positions.length;
-        }
-
-    }
-}
 
 window.Spike = window.classes.Spike = class Spike extends Shape {
     constructor(m) {
@@ -134,6 +112,29 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
         
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, n+1);
+        }
+
+    }
+}
+
+window.MultiShape = window.classes.MultiShape = class MultiShape extends Shape {
+    constructor(shapes) {   //[M1, Shape1], [M2, Shape2], ... 
+        super("positions", "normals");
+        
+        var indice_offset = 0;
+
+        for (let p = 0; p < shapes.length; p++) {
+            var M = shapes[p][0];
+            var shape = shapes[p][1];
+
+            for (let i = 0; i < shape.positions.length; i++) {
+                this.positions.push( M.times(Vec.of(...shape.positions[i], 1)).to3() );
+                this.normals.push( M.times(Vec.of(...shape.normals[i])).to3() );
+            }
+            for (let i = 0; i < shape.indices.length; i++) {
+                this.indices.push(shape.indices[i]+indice_offset);
+            }
+            indice_offset += shape.positions.length;
         }
 
     }
