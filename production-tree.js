@@ -35,6 +35,10 @@ class TreeSpike extends TreePart {
 	var M =  m.times(Mat4.rotation(this.base_rotation, Vec.of(0, 0, 1)));
 	this.shape.draw(graphics_state, M, this.mat);
     }
+
+    get_model() {
+        return new Spike(this.shape_matrix());
+    }
 }
 
 class TreeSegment extends TreePart {
@@ -70,6 +74,10 @@ class TreeSegment extends TreePart {
     draw(graphics_state, m) {
 	var M =  m.times(Mat4.rotation(this.base_rotation, Vec.of(0, 0, 1)));
 	this.shape.draw(graphics_state, M, this.mat);
+    }
+
+    get_model() {
+	return new Segment(this.shape_matrix());
     }
 }
 
@@ -169,7 +177,7 @@ class TreeProduction {
 	}
 	return new Tree(production);
     }
-
+    
     draw_tree(size, graphics_state, m) {
 	var size_stack = [];
 	var matrix_stack = [];
@@ -205,6 +213,49 @@ class TreeProduction {
 	}
     }
 
+    get_model() {
+	return this.private_get_model(1, Mat4.identity());
+    }
+    
+    private_get_model(size, m) {
+	var subshapes = [];
+	var size_stack = [];
+	var matrix_stack = [];
+	for (let i = 0; i < this.rules.length; i++) {
+	    if (size <= this.rules[i].max_size) {
+		for (let j = 0; j < this.rules[i].left_hand.length; j++) {
+		    var k = this.rules[i].left_hand[j];
+		    if (k.to_string() == 'I') {
+			size *= k.end_size;
+			let R = Mat4.rotation(k.base_rotation, Vec.of(0, 0, 1));
+			subshapes.push([m.times(R), k.get_model()]);
+			m = k.next_matrix(m);
+		    }
+		    else if (k.to_string() == 'L(') {
+			size_stack.push(size);
+			size *= k.size_ratio;
+			matrix_stack.push(m);
+			m = k.next_matrix(m)
+		    }
+		    else if (k.to_string() == ')') {
+			size = size_stack.pop();
+			m = matrix_stack.pop();
+		    }
+		    else if (k.to_string() == 'O') {
+			subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+		    }
+		    else if (k.to_string() == 'v') {
+			size = 0;
+			let R = Mat4.rotation(k.base_rotation, Vec.of(0, 0, 1));			
+			subshapes.push([m, k.get_model()]);
+		    }
+		}
+		break;
+	    }
+	}
+	return new MultiShape(subshapes);
+    }
+    
     
 }
 
