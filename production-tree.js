@@ -144,39 +144,7 @@ class TreeProduction {
 	}
     }
     
-    generate_tree(size) {
-	var production = [];
-	var size_stack = [];
-	for (let i = 0; i < this.rules.length; i++) {
-	    if (size <= this.rules[i].max_size) {
-		for (let j = 0; j < this.rules[i].left_hand.length; j++) {
-		    var k = this.rules[i].left_hand[j];
-		    if (k.to_string() == 'I') {
-			size *= k.end_size;
-			production.push(k);
-		    }
-		    else if (k.to_string() == 'L(') {
-			size_stack.push(size);
-			size *= k.size_ratio;
-			production.push(k);
-		    }
-		    else if (k.to_string() == ')') {
-			size = size_stack.pop();
-			production.push(k);
-		    }
-		    else if (k.to_string() == 'O') {
-			production = production.concat(this.generate_tree(size));
-		    }
-		    else if (k.to_string() == 'v') {
-			size = 0;
-			production.push(k);
-		    }
-		}
-		break;
-	    }
-	}
-	return new Tree(production);
-    }
+
     
     draw_tree(size, graphics_state, m) {
 	var size_stack = [];
@@ -259,18 +227,3 @@ class TreeProduction {
     
 }
 
-class Tree {
-
-    constructor(tree_parts) {
-	this.tree_parts = tree_parts;
-    }
-
-    to_string() {
-	var sumstr = "";
-	for (let i = 0; i < this.tree_parts.length; i++) {
-	    sumstr += this.tree_parts[i].to_string()+" ";
-	}
-	sumstr = sumstr.slice(0, -1);
-	return sumstr;
-    }
-}

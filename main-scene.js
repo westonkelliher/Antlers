@@ -91,8 +91,6 @@ class Assignment_One_Scene extends Scene_Component {
         tree_prod.add_rule(b_c*.75, ruleB);
         tree_prod.add_rule(b_c, ruleA);
 
-        var tree = tree_prod.generate_tree(1);
-        console.log(tree.to_string());
         this.tree_prod = tree_prod;
         this.tree_model = this.tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(context.gl);
