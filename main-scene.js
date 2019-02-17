@@ -66,8 +66,7 @@ class Assignment_One_Scene extends Scene_Component {
         //endA2
         var segA3 = new TreeSegment(Math.PI*10/7, 5, Math.PI*0, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
         //openA3
-        var ruleA = new TreeProductionRule(1, [branchA2, segA2, open, end, segA1, segA3, open]);
-
+        
         var branchB1 = new TreeBranch(0, Math.PI*0, .69);
         var branchB2 = new TreeBranch(0, Math.PI*2/5, .7);
         var branchB3 = new TreeBranch(0, Math.PI*4/5, .71);
@@ -77,22 +76,23 @@ class Assignment_One_Scene extends Scene_Component {
         var segC1 = new TreeSegment(Math.PI*1/20, 4, Math.PI*0, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
         var segC2 = new TreeSegment(Math.PI*-1/15, 4, Math.PI*0, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
         
-        
-        var ruleB = new TreeProductionRule(1, [branchB1, open, end, branchB2, open, end, 
-                                            branchB3, open, end, branchB4, open, end, branchB5, open, end])
 
-        var ruleC = new TreeProductionRule(1, [segC1, segC2, open]);
-
-        var ruleD = new TreeProductionRule(1, [segC1, open]);
-        
-        var tree_prod = new TreeProduction(spike0);
         var b_c = .15;
+        var ruleA = new TreeProductionRule(1, [branchA2, segA2, open, end, segA1, segA3, open]);
+        var ruleB = new TreeProductionRule(b_c, [branchB1, open, end, branchB2, open, end, 
+                                            branchB3, open, end, branchB4, open, end, branchB5, open, end])
+        var ruleC = new TreeProductionRule(b_c*.8, [segC1, segC2, spike0]);
+
+        
+        
+        var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
+        /*
         tree_prod.add_rule(b_c*.75*.63, ruleC);
         tree_prod.add_rule(b_c*.75, ruleB);
         tree_prod.add_rule(b_c, ruleA);
+        */
 
-        this.tree_prod = tree_prod;
-        this.tree_model = this.tree_prod.get_model();
+        this.tree_model = tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(context.gl);
     }
 
@@ -167,8 +167,8 @@ class Assignment_One_Scene extends Scene_Component {
 
         this.draw_axes(graphics_state, 12);
 
-
-        this.tree_model.draw(graphics_state, m, this.clay.override({color: this.white}));
+        R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
+        this.tree_model.draw(graphics_state, R, this.clay.override({color: this.white}));
     }
 }
 

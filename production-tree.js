@@ -113,8 +113,8 @@ class TreeOpenning extends TreePart {
 
 class TreeProductionRule {
     constructor(max_size, left_hand) {
+	this.left_hand = left_hand; //array of
 	this.max_size = max_size;
-	this.left_hand = left_hand; //array of 
     }
 
     create_shapes(graphics_state, gl, mat) {
@@ -129,13 +129,8 @@ class TreeProductionRule {
 
 //rules should increase in max_size from left to right
 class TreeProduction {
-    constructor(base_spike) {
-	this.rules = [new TreeProductionRule(1, [base_spike])];
-    }
-
-    add_rule(min_size, rule) {
-	this.rules[this.rules.length-1].max_size = min_size;
-	this.rules.push(rule);
+    constructor(rules) {
+	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
     }
 
     create_shapes(graphics_state, gl, mat) {
@@ -143,8 +138,6 @@ class TreeProduction {
 	    this.rules[i].create_shapes(graphics_state, gl, mat);
 	}
     }
-    
-
     
     draw_tree(size, graphics_state, m) {
 	var size_stack = [];
