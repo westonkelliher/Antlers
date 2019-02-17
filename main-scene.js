@@ -86,14 +86,16 @@ class Assignment_One_Scene extends Scene_Component {
         var ruleD = new TreeProductionRule(1, [segC1, open]);
         
         var tree_prod = new TreeProduction(spike0);
-        tree_prod.add_rule(.5*.75*.63*.85, ruleD);
-        tree_prod.add_rule(.5*.75*.63, ruleC);
-        tree_prod.add_rule(.5*.75, ruleB);
-        tree_prod.add_rule(.5, ruleA);
+        var b_c = .15;
+        tree_prod.add_rule(b_c*.75*.63, ruleC);
+        tree_prod.add_rule(b_c*.75, ruleB);
+        tree_prod.add_rule(b_c, ruleA);
 
         var tree = tree_prod.generate_tree(1);
         console.log(tree.to_string());
         this.tree_prod = tree_prod;
+        this.tree_model = this.tree_prod.get_model();
+        this.tree_model.copy_onto_graphics_card(context.gl);
     }
 
 
@@ -168,9 +170,7 @@ class Assignment_One_Scene extends Scene_Component {
         this.draw_axes(graphics_state, 12);
 
 
-        this.tree_prod.create_shapes(graphics_state, this.cont.gl, this.clay.override({color: this.white})); //TODO: do this once not every frame
-        this.tree_prod.draw_tree(1, graphics_state, m);
-
+        this.tree_model.draw(graphics_state, m, this.clay.override({color: this.white}));
     }
 }
 
