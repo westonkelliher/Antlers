@@ -28,8 +28,9 @@ class Assignment_One_Scene extends Scene_Component {
 
         // Make some Material objects available to you:
         this.clay = context.get_instance(Phong_Shader).material(Color.of(.9, .6, .9, 1), {
-            ambient: .4,
-            diffusivity: .4
+            ambient: .35,
+            diffusivity: .45,
+            specularity: .1
         });
         this.plastic = this.clay.override({
             specularity: .6
@@ -48,7 +49,7 @@ class Assignment_One_Scene extends Scene_Component {
         this.dark = Color.of(.2, .25, .2, 1);
         this.brown = Color.of(.4, .3, .25, 1);
         this.orange = Color.of(1, .7, 0, 1);
-        this.white = Color.of(1, 1, .8, 1);
+        this.white = Color.of(1, 1, .85, 1);
 
         this.t = 0;
 
@@ -77,8 +78,8 @@ class Assignment_One_Scene extends Scene_Component {
         var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
         
 
-        var b_c = .3;
-        var ruleA = new TreeProductionRule(1, [branchA2, segA2, open, end, segA1, segA3, open]);
+        var b_c = .45;
+        var ruleA = new TreeProductionRule(20, [branchA2, segA2, open, end, segA1, segA3, open]);
         var ruleB = new TreeProductionRule(b_c, [branchB1, open, end, branchB2, open, end, 
                                             branchB3, open, end, branchB4, open, end, branchB5, open, end])
         var ruleC = new TreeProductionRule(b_c*.8, [segC1, segC2, spike0]);
@@ -91,7 +92,7 @@ class Assignment_One_Scene extends Scene_Component {
         tree_prod.add_rule(b_c*.75, ruleB);
         tree_prod.add_rule(b_c, ruleA);
         */
-
+        this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(context.gl);
     }
@@ -169,6 +170,10 @@ class Assignment_One_Scene extends Scene_Component {
 
         R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
         this.tree_model.draw(graphics_state, R, this.clay.override({color: this.white}));
+
+        T = Mat4.translation(Vec.of(10, 10, 0));
+        this.tree_prod.init(this.cont.gl, graphics_state, this.clay.override({color: this.blue}));
+        this.tree_prod.draw_tree(1, T.times(R));
     }
 }
 

@@ -17,20 +17,25 @@ class TreeSpike extends TreePart {
 	this.base_phi = base_phi;
     }
 
-    shape_matrix() {
-        var lengthwise_tilt = Mat4.rotation(this.base_phi, Vec.of(Math.cos(this.base_theta+Math.PI*1/2), Math.sin(this.base_theta+Math.PI*1/2), 0));
-        var length_T = Mat4.translation(Vec.of(0, 0, this.base_length));
-        return Mat4.identity().times(lengthwise_tilt).times(length_T);
+    init(gl, gs, material) {
+	this.material = material;
+	this.gl = gl;
+	this.gs = gs;
+	this.gpu_loaded = false;
     }
 
-    create_shape(graphics_state, gl, mat) {
+
+    create_shape() {
 	this.shape = new Spike(this.base_length, this.base_theta, this.base_phi);
-	this.shape.copy_onto_graphics_card(gl);
-	this.mat = mat;
+	this.shape.copy_onto_graphics_card(this.gl);
+	this.gpu_loaded = true;
     }
-
-    draw(graphics_state, m) {
-	this.shape.draw(graphics_state, m, this.mat);
+    
+    draw(m) {
+	if (!this.gpu_loaded) {
+	    this.create_shape();
+	}
+	this.shape.draw(this.gs, m, this.material);
     }
 
     get_model() {
@@ -49,13 +54,14 @@ class TreeSegment extends TreePart {
 	this.end_phi = end_phi;
     }
 
-    shape_matrix() {
-	var end_tilt = Mat4.rotation(this.end_phi, Vec.of(Math.cos(this.end_theta+Math.PI*1/2), Math.sin(this.end_theta+Math.PI*1/2), 0));
-        var lengthwise_tilt = Mat4.rotation(this.base_phi, Vec.of(Math.cos(this.base_theta+Math.PI*1/2), Math.sin(this.base_theta+Math.PI*1/2), 0));
-        var length_T = Mat4.translation(Vec.of(0, 0, this.base_length));
-        var end_S = Mat4.scale(Vec.of(this.end_size, this.end_size, this.end_size));
-        return Mat4.identity().times(lengthwise_tilt).times(length_T).times(end_tilt).times(end_S);
+    
+    init(gl, gs, material) {
+	this.material = material;
+	this.gl = gl;
+	this.gs = gs;
+	this.gpu_loaded = false;
     }
+
 
     next_matrix(m) {
 	var phi = Mat4.rotation(this.base_phi, Vec.of(0, 1, 0));
@@ -66,14 +72,17 @@ class TreeSegment extends TreePart {
         return m.times(theta).times(phi).times(T).times(S).times(tilt);
     }
     
-    create_shape(graphics_state, gl, mat) {
+    create_shape() {
 	this.shape = new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
-	this.shape.copy_onto_graphics_card(gl);
-	this.mat = mat;
+	this.shape.copy_onto_graphics_card(this.gl);
+	this.gpu_loaded = true;
     }
 
-    draw(graphics_state, m) {
-	this.shape.draw(graphics_state, m, this.mat);
+    draw(m) {
+	if (!this.gpu_loaded) {
+	    this.create_shape();
+	}
+	this.shape.draw(this.gs, m, this.material);
     }
 
     get_model() {
@@ -117,10 +126,10 @@ class TreeProductionRule {
 	this.max_size = max_size;
     }
 
-    create_shapes(graphics_state, gl, mat) {
+    init(gl, gs, material) {
 	for (let i = 0; i < this.left_hand.length; i++) {
-	    if (this.left_hand[i].to_string() == "I" || this.left_hand[i].to_string() == "v"){
-		this.left_hand[i].create_shape(graphics_state, gl, mat);
+	    if (this.left_hand[i].to_string() == 'I' || this.left_hand[i].to_string() == 'v') {
+		this.left_hand[i].init(gl, gs, material);
 	    }
 	}
     }
@@ -133,13 +142,14 @@ class TreeProduction {
 	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
     }
 
-    create_shapes(graphics_state, gl, mat) {
+    
+    init(gl, gs, material) {
 	for (let i = 0; i < this.rules.length; i++) {
-	    this.rules[i].create_shapes(graphics_state, gl, mat);
+	    this.rules[i].init(gl, gs, material);
 	}
     }
     
-    draw_tree(size, graphics_state, m) {
+    draw_tree(size, m) {
 	var size_stack = [];
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
@@ -148,7 +158,7 @@ class TreeProduction {
 		    var k = this.rules[i].left_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
-			k.draw(graphics_state, m);
+			k.draw(m);
 			m = k.next_matrix(m);
 		    }
 		    else if (k.to_string() == 'L(') {
@@ -162,11 +172,11 @@ class TreeProduction {
 			m = matrix_stack.pop();
 		    }
 		    else if (k.to_string() == 'O') {
-			this.draw_tree(size, graphics_state, m);
+			this.draw_tree(size, m);
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			k.draw(graphics_state, m);
+			k.draw(m);
 		    }
 		}
 		break;
