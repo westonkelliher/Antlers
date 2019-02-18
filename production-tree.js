@@ -1,4 +1,3 @@
-
 class TreePart {
     constructor(symbol) {
 	this.symbol = symbol
@@ -11,9 +10,8 @@ class TreePart {
 }
 
 class TreeSpike extends TreePart {
-    constructor(base_rotation, base_length, base_theta, base_phi) {
+    constructor(base_length, base_theta, base_phi) {
 	super('v');
-	this.base_rotation = base_rotation;
 	this.base_length = base_length;
 	this.base_theta = base_theta;
 	this.base_phi = base_phi;
@@ -26,25 +24,23 @@ class TreeSpike extends TreePart {
     }
 
     create_shape(graphics_state, gl, mat) {
-	this.shape = new Spike(this.shape_matrix());
+	this.shape = new Spike(this.base_length, this.base_theta, this.base_phi);
 	this.shape.copy_onto_graphics_card(gl);
 	this.mat = mat;
     }
 
     draw(graphics_state, m) {
-	var M =  m.times(Mat4.rotation(this.base_rotation, Vec.of(0, 0, 1)));
-	this.shape.draw(graphics_state, M, this.mat);
+	this.shape.draw(graphics_state, m, this.mat);
     }
 
     get_model() {
-        return new Spike(this.shape_matrix());
+        return new Spike(this.base_length, this.base_theta, this.base_phi);
     }
 }
 
 class TreeSegment extends TreePart {
-    constructor(base_rotation, base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
+    constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	super('I');
-	this.base_rotation = base_rotation;
 	this.base_length = base_length;
 	this.base_theta = base_theta;
 	this.base_phi = base_phi;
@@ -62,22 +58,26 @@ class TreeSegment extends TreePart {
     }
 
     next_matrix(m) {
-	return m.times(Mat4.rotation(this.base_rotation, Vec.of(0, 0, 1))).times(this.shape_matrix());
+	var phi = Mat4.rotation(this.base_phi, Vec.of(0, 1, 0));
+        var theta = Mat4.rotation(this.base_theta, Vec.of(0, 0, 1));
+        var T = Mat4.translation(Vec.of(0, 0, this.base_length));
+        var S = Mat4.scale(Vec.of(this.end_size, this.end_size, this.end_size));
+        var tilt = Mat4.rotation(this.end_phi, Vec.of(Math.cos(this.end_theta+Math.PI*1/2), Math.sin(this.end_theta+Math.PI*1/2), 0));
+        return m.times(theta).times(phi).times(T).times(S).times(tilt);
     }
     
     create_shape(graphics_state, gl, mat) {
-	this.shape = new Segment(this.shape_matrix());
+	this.shape = new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
 	this.shape.copy_onto_graphics_card(gl);
 	this.mat = mat;
     }
 
     draw(graphics_state, m) {
-	var M =  m.times(Mat4.rotation(this.base_rotation, Vec.of(0, 0, 1)));
-	this.shape.draw(graphics_state, M, this.mat);
+	this.shape.draw(graphics_state, m, this.mat);
     }
 
     get_model() {
-	return new Segment(this.shape_matrix());
+	return new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
 }
 
@@ -188,8 +188,7 @@ class TreeProduction {
 		    var k = this.rules[i].left_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
-			let R = Mat4.rotation(k.base_rotation, Vec.of(0, 0, 1));
-			subshapes.push([m.times(R), k.get_model()]);
+			subshapes.push([m, k.get_model()]);
 			m = k.next_matrix(m);
 		    }
 		    else if (k.to_string() == 'L(') {

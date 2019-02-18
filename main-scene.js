@@ -57,14 +57,14 @@ class Assignment_One_Scene extends Scene_Component {
         var open = new TreeOpenning();
         var end = new TreeBranchEnd();
         
-        var spike0 = new TreeSpike(Math.PI*0, 6, Math.PI*0, -Math.PI*1/8);
+        var spike0 = new TreeSpike(6, Math.PI*0, -Math.PI*1/8);
         
-        var segA1 = new TreeSegment(Math.PI*21/23, 4, Math.PI*0, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
+        var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
         var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
-        var segA2 = new TreeSegment(Math.PI*0, 3, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
+        var segA2 = new TreeSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
         //openA2
         //endA2
-        var segA3 = new TreeSegment(Math.PI*10/7, 5, Math.PI*0, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
+        var segA3 = new TreeSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
         //openA3
         
         var branchB1 = new TreeBranch(0, Math.PI*0, .69);
@@ -73,11 +73,11 @@ class Assignment_One_Scene extends Scene_Component {
         var branchB4 = new TreeBranch(0, Math.PI*6/5, .73);
         var branchB5 = new TreeBranch(0, Math.PI*8/5, .72);
 
-        var segC1 = new TreeSegment(Math.PI*1/20, 4, Math.PI*0, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
-        var segC2 = new TreeSegment(Math.PI*-1/15, 4, Math.PI*0, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
+        var segC1 = new TreeSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
+        var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
         
 
-        var b_c = .15;
+        var b_c = .3;
         var ruleA = new TreeProductionRule(1, [branchA2, segA2, open, end, segA1, segA3, open]);
         var ruleB = new TreeProductionRule(b_c, [branchB1, open, end, branchB2, open, end, 
                                             branchB3, open, end, branchB4, open, end, branchB5, open, end])

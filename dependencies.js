@@ -65,25 +65,36 @@ window.CircleN = window.classes.CircleN = class CircleN extends Shape {
 }
 
 window.Segment = window.classes.Segment = class Segment extends Shape {
-    constructor(m) {
+    constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
         super("positions", "normals");
         
         var n = 16;
+        var remainder = base_theta%(Math.PI*2/n);
+        var m = Mat4.rotation(base_theta - remainder, Vec.of(0, 0, 1));
+
 
         this.positions.push([0, 0, 0]);
         this.normals.push([0, 0, -1]);
         for (let i = 0; i < n; i++) {
-            this.positions.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
-            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
+            this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
+            this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0)).to3());
             //this.indices.push(0, i+1, i == n-1 ? 1 : i+2);
         }
+
+        var phi = Mat4.rotation(base_phi, Vec.of(0, 1, 0));
+        var theta = Mat4.rotation(base_theta, Vec.of(0, 0, 1));
+        var T = Mat4.translation(Vec.of(0, 0, base_length));
+        var S = Mat4.scale(Vec.of(end_size, end_size, end_size));
+        var tilt = Mat4.rotation(end_phi, Vec.of(Math.cos(end_theta+Math.PI*1/2), Math.sin(end_theta+Math.PI*1/2), 0));
+        m = theta.times(phi).times(T).times(S).times(tilt);
 
         for (let i = 0; i < n; i++) {
             this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
             this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 0)).to3());
             //this.indices.push(n+1, i+n+2, i == n-1 ? n+2 : i+n+3);
         }
-
+        
+        
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, i+n+1);
             this.indices.push(i+n+1, i == n-1 ? n+1 : i+n+2, i == n-1 ? 1 : i+2);
@@ -94,21 +105,29 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
 
 
 window.Spike = window.classes.Spike = class Spike extends Shape {
-    constructor(m) {
+    constructor(base_length, base_theta, base_phi) {
         super("positions", "normals");
         
         var n = 16;
+        var remainder = base_theta%(Math.PI*2/n);
+        var m = Mat4.rotation(base_theta - remainder, Vec.of(0, 0, 1));
 
         this.positions.push([0, 0, 0]);
         this.normals.push([0, 0, -1]);
         for (let i = 0; i < n; i++) {
-            this.positions.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
-            this.normals.push([Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0]);
-            this.indices.push(0, i+1, i == n-1 ? 1 : i+2);
+            this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
+            this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0)).to3());
+            //this.indices.push(0, i+1, i == n-1 ? 1 : i+2);
         }
+
+        var phi = Mat4.rotation(base_phi, Vec.of(0, 1, 0));
+        var theta = Mat4.rotation(base_theta, Vec.of(0, 0, 1));
+        var T = Mat4.translation(Vec.of(0, 0, base_length));
+        m = theta.times(phi).times(T);
 
         this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
         this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
+        
         
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, n+1);
