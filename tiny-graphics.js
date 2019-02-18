@@ -58,19 +58,19 @@ class Vec extends Float32Array {
         return this.times(1 / this.norm())
     }
     normalize() {
-            this.scale(1 / this.norm())
-        }
-        // Optimized arithmetic unrolls loops for vectors of length <= 4.
+        this.scale(1 / this.norm())
+    }
+    // Optimized arithmetic unrolls loops for vectors of length <= 4.
     dot(b) {
-            if (this.length == 3) return this[0] * b[0] + this[1] * b[1] + this[2] * b[2];
-            if (this.length == 4) return this[0] * b[0] + this[1] * b[1] + this[2] * b[2] + this[3] * b[3];
-            if (this.length > 4) return this.reduce((acc, x, i) => {
-                return acc + x * b[i];
-            }, 0);
-            // Assume a minimum length of 2.
-            return this[0] * b[0] + this[1] * b[1];
-        }
-        // For avoiding repeatedly typing Vec.of in lists.
+        if (this.length == 3) return this[0] * b[0] + this[1] * b[1] + this[2] * b[2];
+        if (this.length == 4) return this[0] * b[0] + this[1] * b[1] + this[2] * b[2] + this[3] * b[3];
+        if (this.length > 4) return this.reduce((acc, x, i) => {
+            return acc + x * b[i];
+        }, 0);
+        // Assume a minimum length of 2.
+        return this[0] * b[0] + this[1] * b[1];
+    }
+    // For avoiding repeatedly typing Vec.of in lists.
     static cast(...args) {
         return args.map(x => Vec.from(x));
     }
@@ -182,6 +182,7 @@ class Mat4 extends Mat {
     static identity() {
         return Mat.of([1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]);
     };
+    
     // Requires a scalar (angle) and a 3x1 Vec (axis)
     static rotation(angle, axis)
         {
@@ -192,18 +193,22 @@ class Mat4 extends Mat {
                 [x * z * omc - y * s, y * z * omc + x * s, z * z * omc + c,     0],
                 [0, 0, 0, 1]);
     }
+    
     // Requires a 3x1 Vec.
     static scale(s) {
         if (typeof s === "number")
             s = [s, s, s];
         return Mat.of([s[0], 0, 0, 0], [0, s[1], 0, 0], [0, 0, s[2], 0], [0, 0, 0, 1]);
     }
+    
     // Requires a 3x1 Vec.
     static translation(t) {
         return Mat.of([1, 0, 0, t[0]], [0, 1, 0, t[1]], [0, 0, 1, t[2]], [0, 0, 0, 1]);
     }
-    // Note:  look_at() assumes the result will be used for a camera and stores its result in inverse space.  You can also use
-    // it to point the basis of any *object* towards anything but you must re-invert it first.  Each input must be 3x1 Vec.                         
+    
+    // Note:  look_at() assumes the result will be used for a camera and stores its result in inverse space.
+    // You can also use it to point the basis of any *object* towards anything but you must re-invert it first.
+    // Each input must be 3x1 Vec.                         
     static look_at(eye, at, up) {
         let z = at.minus(eye).normalized(),
             x = z.cross(up).normalized(), // Compute vectors along the requested coordinate axes.
@@ -214,18 +219,21 @@ class Mat4 extends Mat {
         return Mat4.translation([-x.dot(eye), -y.dot(eye), -z.dot(eye)])
             .times(Mat.of(x.to4(0), y.to4(0), z.to4(0), Vec.of(0, 0, 0, 1)));
     }
+    
     // Box-shaped view volume for projection.
     static orthographic(left, right, bottom, top, near, far) {
         return Mat4.scale(Vec.of(1 / (right - left), 1 / (top - bottom), 1 / (far - near)))
             .times(Mat4.translation(Vec.of(-left - right, -top - bottom, -near - far)))
             .times(Mat4.scale(Vec.of(2, 2, -2)));
     }
+    
     // Frustum-shaped view volume for projection.
     static perspective(fov_y, aspect, near, far) {
         const f = 1 / Math.tan(fov_y / 2),
             d = far - near;
         return Mat.of([f / aspect, 0, 0, 0], [0, f, 0, 0], [0, 0, -(near + far) / d, -2 * near * far / d], [0, 0, -1, 0]);
     }
+    
     // Computing a 4x4 inverse is slow because of the amount of steps; call fewer times when possible.
     static inverse(m) {
         const result = Mat4.identity(),
@@ -284,12 +292,21 @@ class Keyboard_Manager {
         window.addEventListener("focus", () => this.actively_pressed_keys.clear()); // Deal with stuck keys during focus change.
     }
     key_down_handler(event) {
-        if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return; // Don't interfere with typing.
-        this.actively_pressed_keys.add(event.key); // Track the pressed key.
-        for (let saved of Object.values(this.saved_controls)) // Re-check all the keydown handlers.
-        {
-            if (saved.shortcut_combination.every(s => this.actively_pressed_keys.has(s)) && event.ctrlKey == saved.shortcut_combination.includes("Control") && event.shiftKey == saved.shortcut_combination.includes("Shift") && event.altKey == saved.shortcut_combination.includes("Alt") && event.metaKey == saved.shortcut_combination.includes("Meta")) // Modifiers must exactly match.
-                this.callback_behavior(saved.callback, event); // The keys match, so fire the callback.
+        // Don't interfere with typing.
+        if (["INPUT", "TEXTAREA"].includes(event.target.tagName))
+            return;
+        // Track the pressed key.
+        this.actively_pressed_keys.add(event.key);
+        // Re-check all the keydown handlers.
+        for (let saved of Object.values(this.saved_controls)) {
+            // Modifiers must exactly match.
+            if (saved.shortcut_combination.every(s => this.actively_pressed_keys.has(s))
+                && event.ctrlKey == saved.shortcut_combination.includes("Control")
+                && event.shiftKey == saved.shortcut_combination.includes("Shift")
+                && event.altKey == saved.shortcut_combination.includes("Alt")
+                && event.metaKey == saved.shortcut_combination.includes("Meta")) 
+                // The keys match, so fire the callback.
+                this.callback_behavior(saved.callback, event);
         }
     }
     key_up_handler(event) {
@@ -321,13 +338,26 @@ class Code_Manager {
     // "If the end of a statement looks like a regex literal (even if it isn’t), it will 
     constructor(code) {
         const es6_tokens_parser = RegExp([ // be treated as one."  (This can miscolor lines of code containing divisions and comments).
-            /((['"])(?:(?!\2|\\).|\\(?:\r\n|[\s\S]))*(\2)?|`(?:[^`\\$]|\\[\s\S]|\$(?!\{)|\$\{(?:[^{}]|\{[^}]*\}?)*\}?)*(`)?)/, // Any string.
-            /(\/\/.*)|(\/\*(?:[^*]|\*(?!\/))*(\*\/)?)/, // Any comment (2 forms).  And next, any regex:
+            // Any string.
+            /((['"])(?:(?!\2|\\).|\\(?:\r\n|[\s\S]))*(\2)?|`(?:[^`\\$]|\\[\s\S]|\$(?!\{)|\$\{(?:[^{}]|\{[^}]*\}?)*\}?)*(`)?)/,
+            
+            // Any comment (2 forms).
+            /(\/\/.*)|(\/\*(?:[^*]|\*(?!\/))*(\*\/)?)/,
+            
+            // And next, any regex:
             /(\/(?!\*)(?:\[(?:(?![\]\\]).|\\.)*\]|(?![\/\]\\]).|\\.)+\/(?:(?!\s*(?:\b|[\u0080-\uFFFF$\\'"~({]|[+\-!](?!=)|\.?\d))|[gmiyu]{1,5}\b(?![\u0080-\uFFFF$\\]|\s*(?:[+\-*%&|^<>!=?({]|\/(?![\/*])))))/,
-            /(0[xX][\da-fA-F]+|0[oO][0-7]+|0[bB][01]+|(?:\d*\.\d+|\d+\.?)(?:[eE][+-]?\d+)?)/, // Any number.
-            /((?!\d)(?:(?!\s)[$\w\u0080-\uFFFF]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})+)/, // Any name.
-            /(--|\+\+|&&|\|\||=>|\.{3}|(?:[+\-\/%&|^]|\*{1,2}|<{1,2}|>{1,3}|!=?|={1,2})=?|[?~.,:;[\](){}])/, // Any punctuator.
-            /(\s+)|(^$|[\s\S])/ // Any whitespace. Lastly, blank/invalid.
+            
+            // Any number.
+            /(0[xX][\da-fA-F]+|0[oO][0-7]+|0[bB][01]+|(?:\d*\.\d+|\d+\.?)(?:[eE][+-]?\d+)?)/,
+            
+            // Any name.
+            /((?!\d)(?:(?!\s)[$\w\u0080-\uFFFF]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})+)/,
+            
+            // Any punctuator.
+            /(--|\+\+|&&|\|\||=>|\.{3}|(?:[+\-\/%&|^]|\*{1,2}|<{1,2}|>{1,3}|!=?|={1,2})=?|[?~.,:;[\](){}])/,
+            
+            // Any whitespace. Lastly, blank/invalid.
+            /(\s+)|(^$|[\s\S])/
         ].map(r => r.source).join('|'), 'g');
 
         this.tokens = [];
@@ -338,16 +368,26 @@ class Code_Manager {
                 type: "invalid",
                 value: single_token[0]
             }
-            if (single_token[1]) token.type = "string", token.closed = !!(single_token[3] || single_token[4])
-            else if (single_token[5]) token.type = "comment"
-            else if (single_token[6]) token.type = "comment", token.closed = !!single_token[7]
-            else if (single_token[8]) token.type = "regex"
-            else if (single_token[9]) token.type = "number"
-            else if (single_token[10]) token.type = "name"
-            else if (single_token[11]) token.type = "punctuator"
-            else if (single_token[12]) token.type = "whitespace"
-            this.tokens.push(token)
-            if (token.type != "whitespace" && token.type != "comment") this.no_comments.push(token.value);
+            if (single_token[1])
+                token.type = "string", token.closed = !!(single_token[3] || single_token[4]);
+            else if (single_token[5])
+                token.type = "comment";
+            else if (single_token[6])
+                token.type = "comment", token.closed = !!single_token[7];
+            else if (single_token[8])
+                token.type = "regex";
+            else if (single_token[9]) 
+               token.type = "number";
+            else if (single_token[10])
+                token.type = "name";
+            else if (single_token[11])
+                token.type = "punctuator";
+            else if (single_token[12])
+                token.type = "whitespace";
+            
+            this.tokens.push(token);
+            if (token.type != "whitespace" && token.type != "comment")
+                this.no_comments.push(token.value);
         }
     }
 }
@@ -364,10 +404,17 @@ class Vertex_Buffer {
     // your subclass to fill in and associate with the vertices.
     constructor(...array_names) {
         this.array_names = array_names;
-        for (let n of array_names) this[n] = []; // Initialize a blank array member of the Shape with each of the names provided.
+        
+        // Initialize a blank array member of the Shape with each of the names provided.
+        for (let n of array_names)
+            this[n] = [];
         this.indices = [];
-        this.indexed = true; // By default all shapes assume indexed drawing using drawElements().
-        this.array_names_mapping_to_WebGLBuffers = {}; // Get ready to associate a GPU buffer with each array.
+        
+        // By default all shapes assume indexed drawing using drawElements().
+        this.indexed = true;
+        
+        // Get ready to associate a GPU buffer with each array.
+        this.array_names_mapping_to_WebGLBuffers = {};
     }
     // Send the completed vertex and index lists to their own buffers in the graphics card.
     // Optional arguments allow calling this again to overwrite some or all GPU buffers as needed.
@@ -379,8 +426,9 @@ class Vertex_Buffer {
             gl.bufferData(gl.ARRAY_BUFFER, Mat.flatten_2D_to_1D(this[n]), gl.STATIC_DRAW);
         }
         if (this.indexed && write_to_indices) {
-            gl.getExtension("OES_element_index_uint"); // Load an extension to allow shapes with more 
-            this.index_buffer = gl.createBuffer(); // vertices than type "short" can hold.
+            // Load an extension to allow shapes with more vertices than type "short" can hold.
+            gl.getExtension("OES_element_index_uint"); 
+            this.index_buffer = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), gl.STATIC_DRAW);
         }
@@ -391,28 +439,38 @@ class Vertex_Buffer {
         if (this.indexed) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.drawElements(this.gl[type], this.indices.length, gl.UNSIGNED_INT, 0)
-        } // If no indices were provided, assume the vertices are arranged
-        else gl.drawArrays(this.gl[type], 0, this.positions.length); // as triples of positions in a field called "positions".
+        }
+        else {
+            // If no indices were provided, assume the vertices are arranged
+            // as triples of positions in a field called "positions".
+            gl.drawArrays(this.gl[type], 0, this.positions.length);
+        }
     }
-    // To appear onscreen, a shape of any variety
+    // To appear onscreen, a shape of any variety goes through this draw() function, which
+    // executes the shader programs.  The shaders draw the right shape due to pre-selecting
+    // the correct buffer region in the GPU that holds that shape's data.
     draw(graphics_state, model_transform, material, type = "TRIANGLES", gl = this.gl) {
-        if (!this.gl) throw "This shape's arrays are not copied over to graphics card yet."; // goes through this draw() function, which
-        material.shader.activate(); // executes the shader programs.  The shaders
-        material.shader.update_GPU(graphics_state, model_transform, material); // draw the right shape due to pre-selecting
-        // the correct buffer region in the GPU that
-        for (let [attr_name, attribute] of Object.entries(material.shader.g_addrs.shader_attributes)) // holds that shape's data.
-        {
+        if (!this.gl) throw "This shape's arrays are not copied over to graphics card yet.";
+        material.shader.activate(); 
+        material.shader.update_GPU(graphics_state, model_transform, material);
+        for (let [attr_name, attribute] of Object.entries(material.shader.g_addrs.shader_attributes)) {
             const buffer_name = material.shader.map_attribute_name_to_buffer_name(attr_name)
             if (!buffer_name || !attribute.enabled) {
                 if (attribute.index >= 0) gl.disableVertexAttribArray(attribute.index);
                 continue;
             }
             gl.enableVertexAttribArray(attribute.index);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.array_names_mapping_to_WebGLBuffers[buffer_name]); // Activate the correct buffer.
-            gl.vertexAttribPointer(attribute.index, attribute.size, attribute.type, // Populate each attribute 
-                attribute.normalized, attribute.stride, attribute.pointer); // from the active buffer.
+            
+            // Activate the correct buffer.
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.array_names_mapping_to_WebGLBuffers[buffer_name]);
+            
+            // Populate each attribute from the active buffer.
+            gl.vertexAttribPointer(attribute.index, attribute.size, attribute.type,
+                attribute.normalized, attribute.stride, attribute.pointer);
         }
-        this.execute_shaders(gl, type); // Run the shaders to draw every triangle now.
+        
+        // Run the shaders to draw every triangle now.
+        this.execute_shaders(gl, type);
     }
 }
 
@@ -479,29 +537,42 @@ class Shape extends Vertex_Buffer {
                 this.indices = temp_indices;
                 this.texture_coords = temp_tex_coords;
             }
+            
             // Automatically assign the correct normals to each triangular element to achieve flat shading.
             // Affect all recently added triangles (those past "offset" in the list).  Assumes that no
             // vertices are shared across seams.   First, iterate through the index or position triples:
             flat_shade() {
                 this.indexed = false;
                 for (let counter = 0; counter < (this.indexed ? this.indices.length : this.positions.length); counter += 3) {
-                    const indices = this.indexed ? [this.indices[counter], this.indices[counter + 1], this.indices[counter + 2]] : [counter, counter + 1, counter + 2];
+                    const indices = this.indexed ?
+                        [this.indices[counter], this.indices[counter + 1], this.indices[counter + 2]] :
+                        [counter, counter + 1, counter + 2];
                     const [p1, p2, p3] = indices.map(i => this.positions[i]);
-                    const n1 = p1.minus(p2).cross(p3.minus(p1)).normalized(); // Cross the two edge vectors of this
-                    // triangle together to get its normal.
-                    if (n1.times(.1).plus(p1).norm() < p1.norm()) n1.scale(-1); // Flip the normal if adding it to the 
-                    // triangle brings it closer to the origin.
-                    for (let i of indices) this.normals[i] = Vec.from(n1); // Propagate this normal to the 3 vertices.
+                    
+                    // Cross the two edge vectors of this triangle together to get its normal.
+                    const n1 = p1.minus(p2).cross(p3.minus(p1)).normalized();
+                    
+                    // Flip the normal if adding it to the triangle brings it closer to the origin.
+                    if (n1.times(.1).plus(p1).norm() < p1.norm()) n1.scale(-1);
+                    
+                    // Propagate this normal to the 3 vertices.
+                    for (let i of indices)
+                        this.normals[i] = Vec.from(n1);
                 }
             }
         }
     }
     normalize_positions(keep_aspect_ratios = true) {
-        const average_position = this.positions.reduce((acc, p) => acc.plus(p.times(1 / this.positions.length)), Vec.of(0, 0, 0));
-        this.positions = this.positions.map(p => p.minus(average_position)); // Center the point cloud on the origin.
+        const average_position = this.positions.reduce((acc, p) =>
+            acc.plus(p.times(1 / this.positions.length)), Vec.of(0, 0, 0));
+
+        // Center the point cloud on the origin.
+        this.positions = this.positions.map(p => p.minus(average_position));
         const average_lengths = this.positions.reduce((acc, p) =>
             acc.plus(p.map(x => Math.abs(x)).times(1 / this.positions.length)), Vec.of(0, 0, 0));
-        if (keep_aspect_ratios) // Divide each axis by its average distance from the origin.
+
+        // Divide each axis by its average distance from the origin.
+        if (keep_aspect_ratios)
             this.positions = this.positions.map(p => p.map((x, i) => x / average_lengths[i]));
         else
             this.positions = this.positions.map(p => p.times(1 / average_lengths.norm()));
@@ -537,11 +608,15 @@ class Graphics_Addresses {
     constructor(program, gl) {
         const num_uniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
         for (let i = 0; i < num_uniforms; ++i) {
-            let u = gl.getActiveUniform(program, i).name.split('[')[0]; // Retrieve the GPU addresses of each uniform variable in the shader
-            this[u + "_loc"] = gl.getUniformLocation(program, u); // based on their names, and store these pointers for later.
+            // Retrieve the GPU addresses of each uniform variable in the shader
+            // based on their names, and store these pointers for later.
+            let u = gl.getActiveUniform(program, i).name.split('[')[0];
+            this[u + "_loc"] = gl.getUniformLocation(program, u);
         }
 
-        this.shader_attributes = {}; // Assume per-vertex attributes will each be a set of 1 to 4 floats:
+        this.shader_attributes = {};
+        
+        // Assume per-vertex attributes will each be a set of 1 to 4 floats:
         const type_to_size_mapping = {
             0x1406: 1,
             0x8B50: 2,
@@ -549,12 +624,15 @@ class Graphics_Addresses {
             0x8B52: 4
         };
         const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-        for (let i = 0; i < numAttribs; i++) // https://github.com/greggman/twgl.js/blob/master/dist/twgl-full.js for another example.
-        {
+        
+        // https://github.com/greggman/twgl.js/blob/master/dist/twgl-full.js for another example.
+        for (let i = 0; i < numAttribs; i++) {
             const attribInfo = gl.getActiveAttrib(program, i);
+            
+            // Pointers to all shader attribute variables
             this.shader_attributes[attribInfo.name] = {
-                index: gl.getAttribLocation(program, attribInfo.name), // Pointers to all shader
-                size: type_to_size_mapping[attribInfo.type], // attribute variables
+                index: gl.getAttribLocation(program, attribInfo.name),
+                size: type_to_size_mapping[attribInfo.type],
                 enabled: true,
                 type: gl.FLOAT,
                 normalized: false,
@@ -578,23 +656,26 @@ class Shader {
         const vertShdr = gl.createShader(gl.VERTEX_SHADER);
         gl.shaderSource(vertShdr, shared + this.vertex_glsl_code());
         gl.compileShader(vertShdr);
-        if (!gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS)) throw "Vertex shader compile error: " + gl.getShaderInfoLog(vertShdr);
+        if (!gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS))
+            throw "Vertex shader compile error: " + gl.getShaderInfoLog(vertShdr);
 
         const fragShdr = gl.createShader(gl.FRAGMENT_SHADER);
         gl.shaderSource(fragShdr, shared + this.fragment_glsl_code());
         gl.compileShader(fragShdr);
-        if (!gl.getShaderParameter(fragShdr, gl.COMPILE_STATUS)) throw "Fragment shader compile error: " + gl.getShaderInfoLog(fragShdr);
+        if (!gl.getShaderParameter(fragShdr, gl.COMPILE_STATUS))
+            throw "Fragment shader compile error: " + gl.getShaderInfoLog(fragShdr);
 
         gl.attachShader(this.program, vertShdr);
         gl.attachShader(this.program, fragShdr);
         gl.linkProgram(this.program);
-        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) throw "Shader linker error: " + gl.getProgramInfoLog(
-            this.program);
+        if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
+            throw "Shader linker error: " + gl.getProgramInfoLog(this.program);
         this.g_addrs = new Graphics_Addresses(this.program, this.gl);
     }
     activate() {
         this.gl.useProgram(this.program);
     }
+    
     // Subclasses have to override the following five functions:
     material() {}
     update_GPU() {}
@@ -610,27 +691,36 @@ class Texture {
             filename, bool_mipMap, bool_will_copy_to_GPU, id: gl.createTexture()
         });
 
-        gl.bindTexture(gl.TEXTURE_2D, this.id);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            new Uint8Array([255, 0, 0, 255])); // A single red pixel, as a placeholder image to prevent a console warning.
         this.image = new Image();
+        gl.bindTexture(gl.TEXTURE_2D, this.id);
+        
+        // A single red pixel, as a placeholder image to prevent a console warning.
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255]));
+        
         // Instructions for whenever the real image file is ready
         this.image.onload = () => {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, bool_will_copy_to_GPU);
             gl.bindTexture(gl.TEXTURE_2D, this.id);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); // Always use bi-linear sampling when the image
-            // will appear magnified. When it will appear shrunk,
-            if (bool_mipMap) // it's best to use tri-linear sampling of its mip maps:
-            {
+            
+            // Always use bi-linear sampling when the image will appear magnified. When it will appear shrunk,
+            // it's best to use tri-linear sampling of its mip maps:
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); 
+            if (bool_mipMap) {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
                 gl.generateMipmap(gl.TEXTURE_2D);
-            } else // We can also use the worst sampling method, to
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); // illustrate the difference that mip-mapping makes.
+            }
+            
+            // We can also use the worst sampling method, to illustrate the difference that mip-mapping makes.
+            else
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
             this.loaded = true;
         };
-        if (bool_will_copy_to_GPU) // Avoid a browser warning, and load the image file.
-        {
+        
+        // Avoid a browser warning, and load the image file.
+        if (bool_will_copy_to_GPU) {
             this.image.crossOrigin = "Anonymous";
             this.image.src = this.filename;
         }
@@ -655,64 +745,107 @@ class Canvas_Manager {
                 graphics_state: new Graphics_State()
             }
         });
-
-        for (let name of["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"]) // Get the GPU ready, creating a new WebGL context
-            if (gl = this.gl = this.canvas.getContext(name)) break; // for this canvas.
-        if (!gl) throw "Canvas failed to make a WebGL context.";
+        
+        // Get the GPU ready, creating a new WebGL context for this canvas.
+        for (let name of["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"]) 
+            if (gl = this.gl = this.canvas.getContext(name))
+                break;
+        if (!gl)
+            throw "Canvas failed to make a WebGL context.";
 
         this.set_size(dimensions);
-        gl.clearColor.apply(gl, background_color); // Tell the GPU which color to clear the canvas with each frame.
+        
+        // Tell the GPU which color to clear the canvas with each frame.
+        gl.clearColor.apply(gl, background_color);
+        
+        // Enable Z-Buffering test with blending.
         gl.enable(gl.DEPTH_TEST);
-        gl.enable(gl.BLEND); // Enable Z-Buffering test with blending.
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // Specify an interpolation method for blending "transparent" 
-        // triangles over the existing pixels.
-        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture()); // A single red pixel, as a placeholder image to prevent a console warning:
+        gl.enable(gl.BLEND);
+        
+        // Specify an interpolation method for blending "transparent" triangles over the existing pixels.
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+        
+        // A single red pixel, as a placeholder image to prevent a console warning:
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 0, 255]));
 
-        window.requestAnimFrame = (w => // Find the correct browser's version of requestAnimationFrame()
-            w.requestAnimationFrame || w.webkitRequestAnimationFrame // needed for queue-ing up re-display events:
-            || w.mozRequestAnimationFrame || w.oRequestAnimationFrame || w.msRequestAnimationFrame || function(callback, element) {
+        // Find the correct browser's version of requestAnimationFrame()
+        // needed for queue-ing up re-display events:
+        window.requestAnimFrame = (w => 
+            w.requestAnimationFrame
+            || w.webkitRequestAnimationFrame 
+            || w.mozRequestAnimationFrame
+            || w.oRequestAnimationFrame
+            || w.msRequestAnimationFrame
+            || function(callback, element) {
                 w.setTimeout(callback, 1000 / 60);
             })(window);
     }
-    set_size(dimensions = [1080, 600]) // Change the CSS, wait for style to re-flow, then change the canvas attributes.
-        {
-            const [width, height] = dimensions;
-            this.canvas.style["width"] = width + "px";
-            this.canvas.style["height"] = height + "px";
-            Object.assign(this, {
-                width, height
-            }); // Have to assign to both; these attributes on a canvas 
-            Object.assign(this.canvas, {
-                width, height
-            }); // have a special effect on buffers, separate from their style.
-            this.gl.viewport(0, 0, width, height); // Build the canvas's matrix for converting -1 to 1 ranged coords (NCDS)
-        } // into its own pixel coords.
-    get_instance(shader_or_texture) // If a scene requests that the Canvas keeps a certain resource (a Shader 
-        {
-            if (this.instances[shader_or_texture]) // or Texture) loaded, check if we already have one GPU-side first.
-                return this.instances[shader_or_texture]; // Return the one that already is loaded if it exists.  Otherwise,
-            if (typeof shader_or_texture == "string") // If a texture was requested, load it onto a GPU buffer.
-                return this.instances[shader_or_texture] = new Texture(this.gl, shader_or_texture, true); // Or if it's a shader:
-            return this.instances[shader_or_texture] = new(shader_or_texture)(this.gl); // Compile it and put it on the GPU.
-        }
-    register_scene_component(component) // Allow a Scene_Component to show their control panel and enter the event loop.
-        {
-            this.scene_components.unshift(component);
-            component.make_control_panel(component.controls);
-        }
-    render(time = 0) // Animate shapes based upon how much measured real time has transpired.
-        {
-            this.globals.graphics_state.animation_delta_time = time - this.prev_time;
-            if (this.globals.animate) this.globals.graphics_state.animation_time += this.globals.graphics_state.animation_delta_time;
-            this.prev_time = time;
+    
+    // Change the CSS, wait for style to re-flow, then change the canvas attributes.
+    set_size(dimensions = [1080, 600]) {
+        const [width, height] = dimensions;
+        this.canvas.style["width"] = width + "px";
+        this.canvas.style["height"] = height + "px";
+        
+        // Have to assign to both; these attributes on a canvas have a special
+        // effect on buffers, separate from their style.
+        Object.assign(this, {
+            width, height
+        });
+        Object.assign(this.canvas, {
+            width, height
+        });
+        
+        // Build the canvas's matrix for converting -1 to 1 ranged coords (NCDS)
+        // into its own pixel coords.
+        this.gl.viewport(0, 0, width, height);
+    }
+    
+    // If a scene requests that the Canvas keeps a certain resource (a Shader 
+    // or Texture) loaded, check if we already have one GPU-side first.
+    get_instance(shader_or_texture) {
+        
+        // Return the one that already is loaded if it exists.
+        if (this.instances[shader_or_texture])
+            return this.instances[shader_or_texture];
+        
+        // If a texture was requested, load it onto a GPU buffer.
+        if (typeof shader_or_texture == "string")
+            return this.instances[shader_or_texture] = new Texture(this.gl, shader_or_texture, true);
+        
+        // Or if it's a shader: Compile it and put it on the GPU.
+        return this.instances[shader_or_texture] = new(shader_or_texture)(this.gl);
+    }
+    
+    // Allow a Scene_Component to show their control panel and enter the event loop.
+    register_scene_component(component) {
+        this.scene_components.unshift(component);
+        component.make_control_panel(component.controls);
+    }
+    
+    // Animate shapes based upon how much measured real time has transpired.
+    render(time = 0) {
+        this.globals.graphics_state.animation_delta_time = time - this.prev_time;
+        if (this.globals.animate)
+            this.globals.graphics_state.animation_time += this.globals.graphics_state.animation_delta_time;
+        this.prev_time = time;
 
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT); // Clear the canvas's pixels and z-buffer.
+        // Clear the canvas's pixels and z-buffer.
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-            for (let live_string of document.querySelectorAll(".live_string")) live_string.onload(live_string);
-            for (let s of this.scene_components) s.display(this.globals.graphics_state); // Draw each registered animation.
-            this.event = window.requestAnimFrame(this.render.bind(this)); // Now that this frame is drawn, request that render() happen 
-        } // again as soon as all other web page events are processed.
+        // Draw any live strings in the page (e.g., variable bindings)
+        for (let live_string of document.querySelectorAll(".live_string"))
+            live_string.onload(live_string);
+        
+        // Draw each registered animation.
+        for (let s of this.scene_components)
+            s.display(this.globals.graphics_state);
+        
+        // Now that this frame is drawn, request that render() happen 
+        // again as soon as all other web page events are processed.
+        this.event = window.requestAnimFrame(this.render.bind(this));
+    }
 }
 
 
@@ -723,8 +856,12 @@ class Scene_Component {
     constructor(canvas_manager, control_box) {
         const callback_behavior = (callback, event) => {
             callback(event);
-            event.preventDefault(); // Fire the callback and cancel any default browser shortcut that is an exact match.
-            event.stopPropagation(); // Don't bubble the event to parent nodes; let child elements be targetted in isolation.
+            
+            // Fire the callback and cancel any default browser shortcut that is an exact match.
+            event.preventDefault();
+            
+            // Don't bubble the event to parent nodes; let child elements be targetted in isolation.
+            event.stopPropagation();
         }
         Object.assign(this, {
             key_controls: new Keyboard_Manager(document, callback_behavior),
@@ -737,64 +874,81 @@ class Scene_Component {
         this.control_panel = control_box.appendChild(document.createElement("div"));
         this.control_panel.className = "control-div";
     }
+    
+    // Format a scene's control panel.
     new_line(parent = this.control_panel) {
-            parent.appendChild(document.createElement("br"))
-        } // Format a scene's control panel.
-    live_string(callback, parent = this.control_panel) // Create an element somewhere in the control panel that does reporting of the
-        { // scene's values in real time.  The event loop will constantly update all HTML 
-            // elements made this way.
-            parent.appendChild(Object.assign(document.createElement("div"), {
-                className: "live_string",
-                onload: callback
-            }));
+        parent.appendChild(document.createElement("br"))
+    }
+    
+    // Create an element somewhere in the control panel that does reporting of the
+    // scene's values in real time.  The event loop will constantly update all HTML 
+    // elements made this way.
+    live_string(callback, parent = this.control_panel) {
+        parent.appendChild(Object.assign(document.createElement("div"), {
+            className: "live_string",
+            onload: callback
+        }));
+    }
+    
+    // Trigger any scene behavior by assigning a key shortcut and a labelled HTML button to it.
+    key_triggered_button(description, shortcut_combination, callback,
+        color = '#' + Math.random().toString(9).slice(-6),
+        release_event, recipient = this, parent = this.control_panel)
+    {
+        const button = parent.appendChild(document.createElement("button")); 
+        button.default_color = button.style.backgroundColor = color;
+        const press = () => {
+                Object.assign(button.style, {
+                    'background-color': 'red',
+                    'z-index': "1",
+                    'transform': "scale(2)"
+                });
+                callback.call(recipient);
+            },
+            release = () => {
+                Object.assign(button.style, {
+                    'background-color': button.default_color,
+                    'z-index': "0",
+                    'transform': "scale(1)"
+                });
+                if (!release_event) return;
+                release_event.call(recipient);
+            };
+        
+        const key_name = shortcut_combination.join('+').split(" ").join("Space");
+        button.textContent = "(" + key_name + ") " + description;
+        button.addEventListener("mousedown", press);
+        button.addEventListener("mouseup", release);
+        button.addEventListener("touchstart", press, {
+            passive: true
+        });
+        button.addEventListener("touchend", release, {
+            passive: true
+        });
+        if (!shortcut_combination)
+            return;
+        this.key_controls.add(shortcut_combination, press, release);
+    }
+    
+    // Call this to start using a set of shapes.  It ensures that this scene as well as the
+    // Canvas_Manager has pointers to the shapes when needed.  It also loads each shape onto
+    // the GPU if other scenes haven't done so already.  The shapes will be accessible from
+    // a scene by calling "this.ahapes".
+    submit_shapes(canvas_manager, shapes) {
+        if (!this.shapes) this.shapes = {}; 
+        for (let s in shapes) {
+            
+            // If two scenes give any shape the same name as an existing one, the
+            // existing one is used instead and the new shape is thrown out.
+            if (canvas_manager.shapes_in_use[s])
+                this.shapes[s] = canvas_manager.shapes_in_use[s];
+            else
+                this.shapes[s] = canvas_manager.shapes_in_use[s] = shapes[s];
+            this.shapes[s].copy_onto_graphics_card(canvas_manager.gl);
         }
-    key_triggered_button(description, shortcut_combination, callback, color = '#' + Math.random().toString(9).slice(-6),
-            release_event, recipient = this, parent = this.control_panel) // Trigger any scene behavior by assigning a key
-        {
-            const button = parent.appendChild(document.createElement("button")); // shortcut and a labelled HTML button to it.
-            button.default_color = button.style.backgroundColor = color;
-            const press = () => {
-                    Object.assign(button.style, {
-                        'background-color': 'red',
-                        'z-index': "1",
-                        'transform': "scale(2)"
-                    });
-                    callback.call(recipient);
-                },
-                release = () => {
-                    Object.assign(button.style, {
-                        'background-color': button.default_color,
-                        'z-index': "0",
-                        'transform': "scale(1)"
-                    });
-                    if (!release_event) return;
-                    release_event.call(recipient);
-                };
-            const key_name = shortcut_combination.join('+').split(" ").join("Space");
-            button.textContent = "(" + key_name + ") " + description;
-            button.addEventListener("mousedown", press);
-            button.addEventListener("mouseup", release);
-            button.addEventListener("touchstart", press, {
-                passive: true
-            });
-            button.addEventListener("touchend", release, {
-                passive: true
-            });
-            if (!shortcut_combination) return;
-            this.key_controls.add(shortcut_combination, press, release);
-        }
-    submit_shapes(canvas_manager, shapes) // Call this to start using a set of shapes.  It ensures that this scene as well as the
-        // Canvas_Manager has pointers to the shapes when needed.  It also loads each shape onto
-        {
-            if (!this.shapes) this.shapes = {}; // the GPU if other scenes haven't done so already.  The shapes will be accessible from
-            for (let s in shapes) // a scene by calling "this.ahapes".
-            {
-                if (canvas_manager.shapes_in_use[s]) // If two scenes give any shape the same name as an existing one, the
-                    this.shapes[s] = canvas_manager.shapes_in_use[s]; // existing one is used instead and the new shape is thrown out.
-                else this.shapes[s] = canvas_manager.shapes_in_use[s] = shapes[s];
-                this.shapes[s].copy_onto_graphics_card(canvas_manager.gl);
-            }
-        } // You have to override the following functions to use class Scene_Component.
+    }
+    
+    // You have to override the following functions to use class Scene_Component.
     make_control_panel() {}
     display(graphics_state) {}
     show_explanation(document_section) {}
@@ -807,6 +961,7 @@ class Canvas_Widget {
     constructor(element, scenes) {
         this.create(element, scenes)
     }
+    
     create(element, scenes) {
         this.patch_ios_bug();
         element = document.querySelector("#" + element);
@@ -816,6 +971,7 @@ class Canvas_Widget {
             element.innerHTML = "<H1>Error loading the demo.</H1>" + error
         }
     }
+    
     // Correct a flaw in Webkit (iPhone devices; safari mobile) that 
     // breaks TypedArray.from() and TypedArray.of() in subclasses.
     patch_ios_bug() {
@@ -830,6 +986,7 @@ class Canvas_Widget {
             }
         }
     }
+    
     // Assign a Canvas_Manager to the WebGL canvas.
     populate_canvas(element, scenes) {
         if (!scenes.every(x => window[x])) // Make sure each scene class really exists.
@@ -838,12 +995,16 @@ class Canvas_Widget {
         const control_panels = element.appendChild(document.createElement("table"));
         control_panels.className = "control-box";
         const row = control_panels.insertRow(0);
-        this.canvas_manager = new Canvas_Manager(canvas, Color.of(0, 0, 0, 1)); // Second parameter sets background color.
+        
+        // Second parameter sets background color.
+        this.canvas_manager = new Canvas_Manager(canvas, Color.of(0, 0, 0, 1)); 
 
-        for (let scene_class_name of scenes) // Register the initially requested scenes to the render loop.
+        // Register the initially requested scenes to the render loop.
+        for (let scene_class_name of scenes)
             this.canvas_manager.register_scene_component(new window[scene_class_name](this.canvas_manager, row.insertCell()));
 
-        this.canvas_manager.render(); // Start WebGL initialization.  Note that render() will re-queue itself for more calls.
+        // Start WebGL initialization.  Note that render() will re-queue itself for more calls.
+        this.canvas_manager.render();
     }
 }
 
