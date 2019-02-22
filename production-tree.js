@@ -2,11 +2,9 @@ class TreePart {
     constructor(symbol) {
 	this.symbol = symbol
     }
-
     to_string() {
 	return this.symbol
     }
-
 }
 
 class TreeSpike extends TreePart {
@@ -24,16 +22,11 @@ class TreeSpike extends TreePart {
 	this.gpu_loaded = false;
     }
 
-
-    create_shape() {
-	this.shape = new Spike(this.base_length, this.base_theta, this.base_phi);
-	this.shape.copy_onto_graphics_card(this.gl);
-	this.gpu_loaded = true;
-    }
-    
     draw(m) {
 	if (!this.gpu_loaded) {
-	    this.create_shape();
+	    this.shape = new Spike(this.base_length, this.base_theta, this.base_phi);
+	    this.shape.copy_onto_graphics_card(this.gl);
+	    this.gpu_loaded = true;
 	}
 	this.shape.draw(this.gs, m, this.material);
     }
@@ -72,15 +65,11 @@ class TreeSegment extends TreePart {
         return m.times(theta).times(phi).times(T).times(S).times(tilt);
     }
     
-    create_shape() {
-	this.shape = new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
-	this.shape.copy_onto_graphics_card(this.gl);
-	this.gpu_loaded = true;
-    }
-
     draw(m) {
 	if (!this.gpu_loaded) {
-	    this.create_shape();
+	    this.shape = new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
+	    this.shape.copy_onto_graphics_card(this.gl);
+	    this.gpu_loaded = true;
 	}
 	this.shape.draw(this.gs, m, this.material);
     }
