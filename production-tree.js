@@ -139,7 +139,6 @@ class TreeProduction {
 			m = matrix_stack.pop();
 		    }
 		    else if (k.to_string() == 'v') {
-			console.log('v');
 			size = 0;
 			k.draw(m);
 		    }
