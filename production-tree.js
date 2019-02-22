@@ -8,40 +8,17 @@ class TreePart {
     }
 }
 
-//Tree Spike - basically a leaf node
-class TreeSpike extends TreePart {
-    constructor(base_length, base_theta, base_phi) {
-	super('v');
-	this.base_length = base_length;
-	this.base_theta = base_theta;
-	this.base_phi = base_phi;
-    }
-
-    init(gl, gs, material) {
-	this.material = material;
-	this.gl = gl;
-	this.gs = gs;
-	this.gpu_loaded = false;
-    }
-
-    draw(m) {
-	if (!this.gpu_loaded) {
-	    this.shape = new Spike(this.base_length, this.base_theta, this.base_phi);
-	    this.shape.copy_onto_graphics_card(this.gl);
-	    this.gpu_loaded = true;
-	}
-	this.shape.draw(this.gs, m, this.material);
-    }
-
-    get_model() {
-        return new Spike(this.base_length, this.base_theta, this.base_phi);
-    }
-}
-
 //Tree Segment - a segment node
 class TreeSegment extends TreePart {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
-	super('I');
+	if (end_size == undefined || end_size == 0) { //spike
+	    super('v');
+	    this.model_type = Spike;
+	}
+	else {
+	    super('I');
+	    this.model_type = Segment;
+	}
 	this.base_length = base_length;
 	this.base_theta = base_theta;
 	this.base_phi = base_phi;
@@ -49,7 +26,6 @@ class TreeSegment extends TreePart {
 	this.end_theta = end_theta;
 	this.end_phi = end_phi;
     }
-
     
     init(gl, gs, material) {
 	this.material = material;
@@ -57,7 +33,6 @@ class TreeSegment extends TreePart {
 	this.gs = gs;
 	this.gpu_loaded = false;
     }
-
 
     next_matrix(m) {
 	var phi = Mat4.rotation(this.base_phi, Vec.of(0, 1, 0));
@@ -70,7 +45,7 @@ class TreeSegment extends TreePart {
     
     draw(m) {
 	if (!this.gpu_loaded) {
-	    this.shape = new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
+	    this.shape = new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
 	    this.shape.copy_onto_graphics_card(this.gl);
 	    this.gpu_loaded = true;
 	}
@@ -78,7 +53,7 @@ class TreeSegment extends TreePart {
     }
 
     get_model() {
-	return new Segment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
+	return new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
 }
 
