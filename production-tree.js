@@ -81,12 +81,6 @@ class TreeBranchEnd extends TreePart {
     }
 }
 
-class TreeOpenning extends TreePart {
-    constructor() {
-	super('O');
-    }
-    
-}
 
 class TreeProductionRule {
     constructor(max_size, right_hand) {
@@ -127,6 +121,9 @@ class TreeProduction {
 			size *= k.end_size;
 			k.draw(m);
 			m = k.next_matrix(m);
+			if (j == this.rules[i].right_hand.length-1) {
+			    this.draw_tree(size, m)
+			}
 		    }
 		    else if (k.to_string() == 'L(') {
 			size_stack.push(size);
@@ -135,13 +132,14 @@ class TreeProduction {
 			m = k.next_matrix(m)
 		    }
 		    else if (k.to_string() == ')') {
+			if (size != 0) {
+			    this.draw_tree(size, m)
+			}
 			size = size_stack.pop();
 			m = matrix_stack.pop();
 		    }
-		    else if (k.to_string() == 'O') {
-			this.draw_tree(size, m);
-		    }
 		    else if (k.to_string() == 'v') {
+			console.log('v');
 			size = 0;
 			k.draw(m);
 		    }
@@ -168,6 +166,9 @@ class TreeProduction {
 			size *= k.end_size;
 			subshapes.push([m, k.get_model()]);
 			m = k.next_matrix(m);
+			if (j == this.rules[i].right_hand.length-1) {
+			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			}
 		    }
 		    else if (k.to_string() == 'L(') {
 			size_stack.push(size);
@@ -176,11 +177,11 @@ class TreeProduction {
 			m = k.next_matrix(m)
 		    }
 		    else if (k.to_string() == ')') {
+			if (size != 0) {
+			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			}
 			size = size_stack.pop();
 			m = matrix_stack.pop();
-		    }
-		    else if (k.to_string() == 'O') {
-			subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
