@@ -80,7 +80,7 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
         var T = Mat4.translation(Vec.of(0, 0, base_length));
         var S = Mat4.scale(Vec.of(end_size, end_size, end_size));
         var tilt = Mat4.rotation(end_phi, Vec.of(Math.cos(end_theta+Math.PI*1/2), Math.sin(end_theta+Math.PI*1/2), 0));
-        m = theta.times(phi).times(T).times(S).times(tilt);
+        m = theta.times(phi).times(T).times(tilt).times(S);
 
         for (let i = 0; i < n; i++) {
             this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
