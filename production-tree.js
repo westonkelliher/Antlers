@@ -1,3 +1,4 @@
+//Tree Part - superclass
 class TreePart {
     constructor(symbol) {
 	this.symbol = symbol
@@ -7,6 +8,7 @@ class TreePart {
     }
 }
 
+//Tree Spike - basically a leaf node
 class TreeSpike extends TreePart {
     constructor(base_length, base_theta, base_phi) {
 	super('v');
@@ -36,6 +38,7 @@ class TreeSpike extends TreePart {
     }
 }
 
+//Tree Segment - a segment node
 class TreeSegment extends TreePart {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	super('I');
@@ -79,6 +82,7 @@ class TreeSegment extends TreePart {
     }
 }
 
+//Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
 class TreeBranch extends TreePart {
     constructor(branch_point, branch_theta, size_ratio) {
 	super('L(');
@@ -110,15 +114,15 @@ class TreeOpenning extends TreePart {
 }
 
 class TreeProductionRule {
-    constructor(max_size, left_hand) {
-	this.left_hand = left_hand; //array of
+    constructor(max_size, right_hand) {
+	this.right_hand = right_hand; //array of
 	this.max_size = max_size;
     }
 
     init(gl, gs, material) {
-	for (let i = 0; i < this.left_hand.length; i++) {
-	    if (this.left_hand[i].to_string() == 'I' || this.left_hand[i].to_string() == 'v') {
-		this.left_hand[i].init(gl, gs, material);
+	for (let i = 0; i < this.right_hand.length; i++) {
+	    if (this.right_hand[i].to_string() == 'I' || this.right_hand[i].to_string() == 'v') {
+		this.right_hand[i].init(gl, gs, material);
 	    }
 	}
     }
@@ -130,7 +134,6 @@ class TreeProduction {
     constructor(rules) {
 	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
     }
-
     
     init(gl, gs, material) {
 	for (let i = 0; i < this.rules.length; i++) {
@@ -173,6 +176,7 @@ class TreeProduction {
 	}
     }
 
+    //Basically we're currying here
     get_model() {
 	return this.private_get_model(1, Mat4.identity());
     }
