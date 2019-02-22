@@ -146,8 +146,8 @@ class TreeProduction {
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
 	    if (size <= this.rules[i].max_size) {
-		for (let j = 0; j < this.rules[i].left_hand.length; j++) {
-		    var k = this.rules[i].left_hand[j];
+		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
+		    var k = this.rules[i].right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
 			k.draw(m);
@@ -187,8 +187,8 @@ class TreeProduction {
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
 	    if (size <= this.rules[i].max_size) {
-		for (let j = 0; j < this.rules[i].left_hand.length; j++) {
-		    var k = this.rules[i].left_hand[j];
+		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
+		    var k = this.rules[i].right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
 			subshapes.push([m, k.get_model()]);
