@@ -137,7 +137,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         var segA3 = new TreeSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
         //openA3                                                                                                                                                                 
 
-        var branchB1 = new TreeBranch(-.2, Math.PI*0, .69);
+        var branchB1 = new TreeBranch(-.2, Math.PI*0, .7);
         var branchB2 = new TreeBranch(-.2, Math.PI*2/5, .7);
         var branchB3 = new TreeBranch(-.2, Math.PI*4/5, .71);
         var branchB4 = new TreeBranch(-.2, Math.PI*6/5, .73);
@@ -155,18 +155,36 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
+        
+        
+
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
+
+        //create a new tree:
+
+        //1 - define segments and branches
+
+        //2 - define rules made of those segments and branches
+
+        //3 - define production tree from those rules (and define threshholds)
+
+        //4 - generate model from production tree
     }
 
     play_demo() {
+
+        //Pre-loading 
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
         this.tree_model.draw(this.gs, R, this.bone);
         
-        var T = Mat4.translation(Vec.of(10, 10, 0));
-        this.tree_prod.init(this.cont.gl, this.gs, this.bone);
-        this.tree_prod.draw_tree(1, T.times(R));
+
+
+        //re-make model every frame
+        //var T = Mat4.translation(Vec.of(10, 10, 0));
+        //this.tree_prod.init(this.cont.gl, this.gs, this.bone);
+        //this.tree_prod.draw_tree(1, T.times(R));
         
     }
 
@@ -182,12 +200,12 @@ class Assignment_Two_Skeleton extends Scene_Component {
         const t = this.t;
 
         //draw axes
-        this.draw_axes(12);
+        //this.draw_axes(12);
         this.play_demo();
 
-        /*
+        
         // Draw some demo textured shapes
-        let spacing = 6;
+        /* let spacing = 6;
         let m = Mat4.translation(Vec.of(-1 * (spacing / 2) * (this.shape_count - 1), 0, 0));
         for (let k in this.shapes) {
             this.shapes[k].draw(
