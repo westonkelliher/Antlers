@@ -82,6 +82,34 @@ class TreeBranchEnd extends TreePart {
 }
 
 
+class RightHand {
+    constructor(parts) {
+	this.parts = parts;
+    }
+
+    front_append_segment(base_theta, end_theta) {
+	this.parts.unshift(new TreeSegment(0, base_theta, 0, 1, end_theta, 0);
+    }
+    
+    num_segments() {
+	let num = 0;
+	let level = 0;
+	for (let i = 0; i < parts.length; i++) {
+	    if (level == 0 && parts[i].symbol == 'I') {
+		num++;
+	    }
+	    else if (parts[i].symbol == 'L(') {
+		level++;
+	    }
+	    else if (parts[i].symbol == ')') {
+		level--;
+	    }
+	}
+	return num;
+    }
+}
+
+
 class TreeProductionRule {
     constructor(max_size, right_hand) {
 	this.right_hand = right_hand; //array of
