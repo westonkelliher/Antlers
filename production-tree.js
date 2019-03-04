@@ -22,7 +22,7 @@ class TreeSegment extends TreePart {
 	this.base_length = base_length;
 	this.base_theta = base_theta;
 	this.base_phi = base_phi;
-	this.end_size = end_size;
+	this.end_size = end_size; //size relative to base 
 	this.end_theta = end_theta;
 	this.end_phi = end_phi;
     }

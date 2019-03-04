@@ -9,7 +9,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         // Locate the camera here (inverted matrix).
         const r = context.width / context.height;
-        context.globals.graphics_state.camera_transform = Mat4.translation([0, 0, -35]);
+        
+        context.globals.graphics_state.camera_transform = Mat4.translation([0,0,-35]);
         context.globals.graphics_state.projection_transform = Mat4.perspective(Math.PI / 4, r, .1, 1000);
 
         // At the beginning of our program, load one of each of these shape
@@ -28,6 +29,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
             'ball': new Subdivision_Sphere(4)
+
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
@@ -50,11 +52,16 @@ class Assignment_Two_Skeleton extends Scene_Component {
             diffusivity: .45,
             specularity: .1
         });
+         this.antlers = context.get_instance(Phong_Shader).material(Color.of(.55, .40, .20, 1), {
+            ambient: .4,
+            diffusivity: .45,
+            specularity: .1
+        });
 
         // Load some textures for the demo shapes
         this.shape_materials = {};
         const shape_textures = {
-            square: "assets/butterfly.png",
+            square: "assets/grass.jpg",
             box: "assets/even-dice-cubemap.png",
             ball: "assets/soccer_sph_s_resize.png",
             cylinder: "assets/treebark.png",
@@ -62,17 +69,21 @@ class Assignment_Two_Skeleton extends Scene_Component {
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
             circle: "assets/hypnosis.jpg"
+
+
         };
         for (let t in shape_textures)
             this.shape_materials[t] = this.texture_base.override({
                 texture: context.get_instance(shape_textures[t])
             });
-        
+
         this.lights = [new Light(Vec.of(10, 10, 20, 1), Color.of(1, .4, 1, 1), 100000)];
 
         this.t = 0;
 
         this.initialize_demo();
+
+        
     }
 
 
@@ -83,44 +94,67 @@ class Assignment_Two_Skeleton extends Scene_Component {
         });
     }
 
+   
+
     draw_axes(distance) {
         var T; var R; var S; var M;
-        //draw axis cubes                                                                                                                                                        
+        //draw axis cubes
         T = Mat4.translation( Vec.of( 0, 0, 0 ) );
         S = Mat4.scale( Vec.of( .1, .1, .1 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // center 
+        this.shapes.box.draw(this.gs, M, this.plastic); // center
         T = Mat4.translation( Vec.of( distance, 0, 0 ) );
         S = Mat4.scale( Vec.of( .5, .1, .1 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +x                                                                                    
+        this.shapes.box.draw(this.gs, M, this.plastic); // +x
         T = Mat4.translation( Vec.of( -distance, 0, 0 ) );
         S = Mat4.scale( Vec.of( .5, .1, .1 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -x                                                                               
+        this.shapes.box.draw(this.gs, M, this.plastic); // -x
         T = Mat4.translation( Vec.of( 0, distance, 0 ) );
         S = Mat4.scale( Vec.of( .1, .5, .1 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +y                                                                                  
+        this.shapes.box.draw(this.gs, M, this.plastic); // +y
         T = Mat4.translation( Vec.of( 0, -distance, 0 ) );
         S = Mat4.scale( Vec.of( .1, .5, .1 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -y                                                                             
+        this.shapes.box.draw(this.gs, M, this.plastic); // -y
         T = Mat4.translation( Vec.of( 0, 0, distance ) );
         S = Mat4.scale( Vec.of( .1, .1, .5 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +z                                                                                   
+        this.shapes.box.draw(this.gs, M, this.plastic); // +z
         T = Mat4.translation( Vec.of( 0, 0, -distance ) );
         S = Mat4.scale( Vec.of( .1, .1, .5 ) );
         M = Mat4.identity();
         M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -z                                                                              
+        this.shapes.box.draw(this.gs, M, this.plastic); // -z
+    }
+
+
+    intialize_world(world_size, scale){
+
+        var T; var R; var S; var M;
+
+        S = Mat4.scale(Vec.of(scale,scale,scale));
+        R = Mat4.rotation(Math.PI/2, Vec.of(1,0,0));
+
+        for(var i = -world_size; i <= world_size; i += 2){
+            for(var j = -world_size; j <= world_size; j += 2){
+                T = Mat4.translation(Vec.of(i * scale,0,j * scale))
+                M = Mat4.identity();
+                M = M.times(T).times(S).times(R);;
+                this.shapes['square'].draw(this.gs, M,this.shape_materials['square']);
+            }
+        }
+       
+        
+
     }
 
 
@@ -132,10 +166,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
         var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
         var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
         var segA2 = new TreeSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
-        //openA2                                                                                                                                                                 
-        //endA2                                                                                                                                                                  
+        //openA2
+        //endA2
         var segA3 = new TreeSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
-        //openA3                                                                                                                                                                 
+        //openA3
 
         var branchB1 = new TreeBranch(-.2, Math.PI*0, .7);
         var branchB2 = new TreeBranch(-.2, Math.PI*2/5, .7);
@@ -155,8 +189,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
-        
-        
+
+
 
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
@@ -175,45 +209,62 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     play_demo() {
 
-        //Pre-loading 
+        //Pre-loading
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        this.tree_model.draw(this.gs, R, this.bone);
-        
+        this.tree_model.draw(this.gs, R, this.antlers);
+
 
 
         //re-make model every frame
         //var T = Mat4.translation(Vec.of(10, 10, 0));
         //this.tree_prod.init(this.cont.gl, this.gs, this.bone);
         //this.tree_prod.draw_tree(1, T.times(R));
-        
+
     }
 
+   
+    //Pause = Debug
 
     display(graphics_state) {
         this.gs = graphics_state;
         // Use the lights stored in this.lights.
         graphics_state.lights = this.lights;
-                
+
         // Find how much time has passed in seconds, and use that to place shapes.
         if (!this.paused)
             this.t += graphics_state.animation_delta_time / 1000;
         const t = this.t;
 
-        //draw axes
-        //this.draw_axes(12);
+        //first parameter : size of world
+        //second parameter : size of individual planes
+        let sizeOfWorld = 2;
+        let sizeOfPlane = 3;
+        this.intialize_world(sizeOfWorld, sizeOfPlane);  
+        
+        //Camera
+//         let camera_radius = 10;
+        
+//         let R1 = Mat4.rotation(t * Math.PI/6, Vec.of(0,1,0));
+//         let T1 = Mat4.translation(Vec.of(camera_radius * Math.cos(t),0,camera_radius * Math.sin(t)));
+//         let M1 = Mat4.identity();
+
+//         //Allow camera movement if paused.
+//         if (!this.paused)
+//              this.gs.camera_transform = M1.times(R1).times(T1);//.times(T2);
+
         this.play_demo();
 
-        
+
         // Draw some demo textured shapes
-        /* let spacing = 6;
-        let m = Mat4.translation(Vec.of(-1 * (spacing / 2) * (this.shape_count - 1), 0, 0));
-        for (let k in this.shapes) {
-            this.shapes[k].draw(
-                graphics_state,
-                m.times(Mat4.rotation(t, Vec.of(0, 1, 0))),
-                this.shape_materials[k] || this.plastic);
-            m = m.times(Mat4.translation(Vec.of(spacing, 0, 0)));
-        }*/
+//          let spacing = 6;
+//         let m = Mat4.translation(Vec.of(-1 * (spacing / 2) * (this.shape_count - 1), 0, 0));
+//         for (let k in this.shapes) {
+//             this.shapes[k].draw(
+//                 graphics_state,
+//                 m.times(Mat4.rotation(t, Vec.of(0, 1, 0))),
+//                 this.shape_materials[k] || this.plastic);
+//             m = m.times(Mat4.translation(Vec.of(spacing, 0, 0)));
+//         }
     }
 }
 

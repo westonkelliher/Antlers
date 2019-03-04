@@ -60,15 +60,16 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
 
 window.Segment = window.classes.Segment = class Segment extends Shape {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
-        super("positions", "normals");
+        super("positions", "normals", "texture_coords");
         
         var n = 16;
         var remainder = base_theta%(Math.PI*2/n);
         var m = Mat4.rotation(base_theta - remainder, Vec.of(0, 0, 1));
 
-
+        
         this.positions.push([0, 0, 0]);
         this.normals.push([0, 0, -1]);
+        //Generate Base Circle
         for (let i = 0; i < n; i++) {
             this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
             this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0)).to3());
@@ -81,7 +82,7 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
         var S = Mat4.scale(Vec.of(end_size, end_size, end_size));
         var tilt = Mat4.rotation(end_phi, Vec.of(Math.cos(end_theta+Math.PI*1/2), Math.sin(end_theta+Math.PI*1/2), 0));
         m = theta.times(phi).times(T).times(tilt).times(S);
-
+        //Generate End Circle
         for (let i = 0; i < n; i++) {
             this.positions.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 1)).to3());
             this.normals.push(m.times(Vec.of(Math.cos(Math.PI*2*i/n), Math.sin(Math.PI*2*i/n), 0, 0)).to3());
