@@ -55,6 +55,10 @@ class TreeSegment extends TreePart {
     get_model() {
 	return new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
+
+    no_length_copy() {
+	return new Segment(0, this.base_theta, 0, 1, this.end_theta, 0);
+    }
 }
 
 //Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
@@ -72,6 +76,10 @@ class TreeBranch extends TreePart {
 	var T = Mat4.translation(Vec.of(0, 0, this.branch_point));
 	var S = Mat4.scale(Vec.of(this.size_ratio, this.size_ratio, this.size_ratio));
 	return m.times(T).times(R_theta).times(R_phi).times(S);
+    }
+
+    no_length_copy() {
+	return new TreeBranch(0, branch_theta, 0);
     }
 }
 
@@ -107,8 +115,85 @@ class RightHand {
 	}
 	return num;
     }
+
+    make_interpolable(target) {
+	let segs_greater = this.num_segments - target.num_segments();
+	while (segs_greater < 0) {
+	}
+    }
 }
 
+num_segs(rh, i) {
+    let num = 0;
+    let level = 0;
+    for (; i < parts.length && level >= 0; i++) {
+	if (level == 0 && parts[i].symbol == 'I') {
+	    num++;
+	}
+	else if (parts[i].symbol == 'L(') {
+	    level++;
+	}
+	else if (parts[i].symbol == ')') {
+	    level--;
+	}
+    }
+    return num;
+}
+
+n_segs_index(n, rh, i) {
+    let num = 0;
+    let level = 0;
+    for (; i < parts.length && level >= 0 && num < n; i++) {
+	if (level == 0 && parts[i].symbol == 'I') {
+	    num++;
+	}
+	else if (parts[i].symbol == 'L(') {
+	    level++;
+	}
+	else if (parts[i].symbol == ')') {
+	    level--;
+	}
+    }
+    return i;
+}
+
+// make rh1 interpolable to rh2 but do not modify rh2 (returns an interpolator vector?)
+// returns a Right Hand which can be summed with interpolable rh1 to produce rh2?
+make_interpolable(rh1, i1, rh2, i2) {
+    let segs_greater = num_segs(rh1, i1) - num_segs(rh2, i2);
+    let segs_traversed = 0;
+    let segi1 = 0;
+    let segi2 = 0;
+    let level1 = 0;
+    let level2 = 0;
+    let n_segs1 = num_segs(rh1, i1);
+    let n_segs2 = num_segs(rh2, i2);
+    while () {//while within rh arrays and levels are >= 0
+	if (segi1 < n_segs2-n_segs1) {
+	    rh1.splice(i1, 0, rh2[i2].no_length_copy());
+	    if (rh2[i2].to_string() == 'I') {
+
+	    }
+	    else if (rh2[i2].to_string() == 'L(') {
+		level2++;
+	    }
+	    else if (rh2[i2].to_string() == ')') {
+		level2--;
+	    }	    
+	    i1++;
+	    i2++;
+	}
+
+    }
+	
+
+	if (num_segs(rh1, i1) < num_segs(rh2, i2) {
+	for (let k = n_segs_index(num_segs(rh2, i2)-num_segs(rh1, i2), rh2, i2); k >= i2; k--) {
+	    rh1.unshift(
+	}
+	for (let x = n_segs_index(num_segs(rh2, i2)-num_segs(rh1, i2), rh2); i2 < 
+    }
+}
 
 class TreeProductionRule {
     constructor(max_size, right_hand) {
