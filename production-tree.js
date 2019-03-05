@@ -88,7 +88,7 @@ class RightHand {
     }
 
     front_append_segment(base_theta, end_theta) {
-	this.parts.unshift(new TreeSegment(0, base_theta, 0, 1, end_theta, 0);
+	this.parts.unshift(new TreeSegment(0, base_theta, 0, 1, end_theta, 0));
     }
     
     num_segments() {
