@@ -129,12 +129,12 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var spike0 = new TreeSegment(6, Math.PI*0, -Math.PI*1/8);
 
-        var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
-        var segA2 = new TreeSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
+        var segA1 = new TreeSegment(4, Math.PI*17/23, Math.PI*0, .95, Math.PI*.9, Math.PI*1/10);
+        var branchA2 = new TreeBranch(1.5, Math.PI*.15, .95);
+        var segA2 = new TreeSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*.4, Math.PI*1/11);
         //openA2                                                                                                                                                                 
         //endA2                                                                                                                                                                  
-        var segA3 = new TreeSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
+        var segA3 = new TreeSegment(5, Math.PI*0, Math.PI*0, .8, Math.PI*.2, Math.PI*1/9);
         //openA3                                                                                                                                                                 
 
         var branchB1 = new TreeBranch(-.2, Math.PI*0, .69);
@@ -147,7 +147,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
 
 
-        var b_c = .45;
+        var b_c = .15;
         var ruleA = new TreeProductionRule(20, [branchA2, segA2, end, segA1, segA3]);
         var ruleB = new TreeProductionRule(b_c, [branchB1, end, branchB2, end,
                                             branchB3, end, branchB4, end, branchB5, end])
@@ -164,9 +164,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
         this.tree_model.draw(this.gs, R, this.bone);
         
-        var T = Mat4.translation(Vec.of(10, 10, 0));
-        this.tree_prod.init(this.cont.gl, this.gs, this.bone);
-        this.tree_prod.draw_tree(1, T.times(R));
+        //var T = Mat4.translation(Vec.of(10, 10, 0));
+        //this.tree_prod.init(this.cont.gl, this.gs, this.bone);
+        //this.tree_prod.draw_tree(1, T.times(R));
         
     }
 
