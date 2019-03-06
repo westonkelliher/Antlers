@@ -44,6 +44,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
             ambient: .4,
             diffusivity: .4
         });
+        this.oranges = context.get_instance(Phong_Shader).material(Color.of(.5, .5, .5, 1), {
+            ambient: .4,
+            diffusivity: .4
+        });
         this.plastic = this.clay.override({
             specularity: .6
         });
@@ -74,7 +78,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
             circle: "assets/hypnosis.jpg",
-            //rock: "assets/rock.jpg" 
+            head: "assets/head.jpg" 
 
         };
         for (let t in shape_textures)
@@ -144,7 +148,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
     generateRocks(num){
 
 
-        var T; var R; var S; var M; var T1;
+        var T; var R; var S; var M;
 
         M = Mat4.identity();
         for(var i = 2; i < num + 1; i++){
@@ -182,6 +186,75 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     }
 
+    createPerson(x,y,z,t){
+        var T; var R; var S; var Body;
+
+        let torsoHeight = .6;
+        let legHeight = .6;
+        let bodyHeight = legHeight + torsoHeight;
+
+        let headRadius = .5;
+        let bodyRadius = .5;
+
+
+        //Legs
+        var Legs;
+        Legs = Mat4.identity();
+        T = Mat4.translation(Vec.of(x - bodyRadius/2,y + torsoHeight,z));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(t), Vec.of(1,0,0));
+        Legs = Legs.times(T).times(R).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+
+        Legs = Mat4.identity();
+        T = Mat4.translation(Vec.of(x + bodyRadius/2,y + torsoHeight,z));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(-t), Vec.of(1,0,0));
+
+        Legs = Legs.times(T).times(R).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+
+
+        //Torso
+        var Torso;
+        Torso = Mat4.identity();
+        T = Mat4.translation(Vec.of(x,y + torsoHeight + legHeight * 2,z));
+        S = Mat4.scale(Vec.of(bodyRadius,torsoHeight,bodyRadius/2));
+
+        Torso = Torso.times(T).times(S);
+        this.shapes['box'].draw(this.gs, Torso,this.bone);
+
+        //Arms
+        var Arms;
+        Arms = Mat4.identity();
+        T = Mat4.translation(Vec.of(x + bodyRadius + bodyRadius/2,y + torsoHeight + legHeight * 2,z));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(t), Vec.of(1,0,0));
+
+        Arms = Arms.times(T).times(R).times(S);
+        this.shapes['box'].draw(this.gs, Arms,this.plastic);
+
+        Arms = Mat4.identity();
+        T = Mat4.translation(Vec.of(x - (bodyRadius + bodyRadius/2),y + torsoHeight + legHeight * 2,z));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(-t), Vec.of(1,0,0));
+        Arms = Arms.times(T).times(R).times(S);
+        this.shapes['box'].draw(this.gs, Arms,this.plastic);
+
+
+        //Head
+        var Head;
+        Head = Mat4.identity();
+        S = Mat4.scale(Vec.of(headRadius,headRadius,headRadius - .1));
+        R = Mat4.rotation(Math.PI/2, Vec.of(0,0,1));
+        T = Mat4.translation(Vec.of(x,y + torsoHeight * 2 + legHeight * 2 + headRadius,z));
+        Head = Head.times(T).times(S).times(R);
+        this.shapes['box'].draw(this.gs, Head,this.shape_materials['head']);
+    
+
+
+    }
+    
 
     initialize_demo() {
         var end = new TreeBranchEnd();
@@ -264,7 +337,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         //second parameter : size of individual planes
         let world_size = 4;
         let sizeOfPlane = 3;
-       
+
         this.intialize_world(world_size, sizeOfPlane);  
         
         //Camera
@@ -278,6 +351,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 //         if (!this.paused)
 //              this.gs.camera_transform = M1.times(R1).times(T1);//.times(T2);
 
+        this.createPerson(6,0,Math.sin(t) * 2,t);
         this.play_demo();
 
 
