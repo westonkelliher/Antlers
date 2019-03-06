@@ -1,3 +1,7 @@
+
+
+let rand = Math.floor(Math.random() * 4);
+
 class Assignment_Two_Skeleton extends Scene_Component {
     // The scene begins by requesting the camera, shapes, and materials it will need.
     constructor(context, control_box) {
@@ -28,7 +32,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'box': new Cube(),
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
-            'ball': new Subdivision_Sphere(4)
+            'ball': new Subdivision_Sphere(4),
+            'rock': new Rock(1)
 
         }
         this.submit_shapes(context, shapes);
@@ -68,8 +73,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             pyramid: "assets/tetrahedron-texture2.png",
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
-            circle: "assets/hypnosis.jpg"
-
+            circle: "assets/hypnosis.jpg",
+            //rock: "assets/rock.jpg" 
 
         };
         for (let t in shape_textures)
@@ -136,6 +141,24 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.shapes.box.draw(this.gs, M, this.plastic); // -z
     }
 
+    generateRocks(num){
+
+
+        var T; var R; var S; var M; var T1;
+
+        M = Mat4.identity();
+        for(var i = 2; i < num + 1; i++){
+            R = Mat4.rotation(Math.PI/2, Vec.of(0,1,0));
+            if(i % 4 == 0){
+                R = Mat4.rotation(Math.PI/3, Vec.of(0,1,0));
+                T = Mat4.translation(Vec.of(i,0,i));
+            }
+            T = Mat4.translation(Vec.of(i,0,i));
+            M = M.times(R).times(T);
+            this.shapes['rock'].draw(this.gs, M,this.bone);            
+        }
+
+    }
 
     intialize_world(world_size, scale){
 
@@ -152,7 +175,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
                 this.shapes['square'].draw(this.gs, M,this.shape_materials['square']);
             }
         }
-       
+
+
+       this.generateRocks(world_size * 2);
         
 
     }
@@ -237,9 +262,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //first parameter : size of world
         //second parameter : size of individual planes
-        let sizeOfWorld = 2;
+        let world_size = 4;
         let sizeOfPlane = 3;
-        this.intialize_world(sizeOfWorld, sizeOfPlane);  
+       
+        this.intialize_world(world_size, sizeOfPlane);  
         
         //Camera
 //         let camera_radius = 10;
