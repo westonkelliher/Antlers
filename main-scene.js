@@ -147,7 +147,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
 
 
-        var b_c = .15;
+        var b_c = .35;
         var ruleA = new TreeProductionRule(20, [branchA2, segA2, end, segA1, segA3]);
         var ruleB = new TreeProductionRule(b_c, [branchB1, end, branchB2, end,
                                             branchB3, end, branchB4, end, branchB5, end])
@@ -155,15 +155,22 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
+        var ruleQ = new TreeProductionRule(20, [branchA2, segA2, end, segA1, branchA2, segA2, end, segA1, segA3]);
+        this.rule = ruleA;
+        this.rule.make_interpolable(0, ruleQ, 0);
+
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
     }
 
-    play_demo() {
+    play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        this.tree_model.draw(this.gs, R, this.bone);
-        
+        //this.tree_model.draw(this.gs, R, this.bone);
+        this.rule.interpolate(0);
+        let model = this.rule.get_model();
+        model.copy_onto_graphics_card(this.cont.gl);
+        model.draw(this.gs, R, this.bone);
         //var T = Mat4.translation(Vec.of(10, 10, 0));
         //this.tree_prod.init(this.cont.gl, this.gs, this.bone);
         //this.tree_prod.draw_tree(1, T.times(R));
@@ -183,7 +190,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //draw axes
         this.draw_axes(12);
-        this.play_demo();
+        this.play_demo(t);
 
         /*
         // Draw some demo textured shapes
