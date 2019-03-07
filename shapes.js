@@ -206,7 +206,6 @@ window.Cube = window.classes.Cube = class Cube extends Shape {
         ));
 
         this.texture_coords.push(...Vec.cast(
-
         
             [1/3,  1/3], [1/3,  2/3], [2/3, 1/3], [2/3, 2/3],
             [1/3,  0], [1/3,  1/3], [2/3, 0], [2/3, 1/3],

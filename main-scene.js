@@ -78,7 +78,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
             circle: "assets/hypnosis.jpg",
-            head: "assets/head.jpg" 
+            head: "assets/head.jpg",
+            body: "assets/body.png",
+            arms: "assets/arms.png"
 
         };
         for (let t in shape_textures)
@@ -220,9 +222,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
         Torso = Mat4.identity();
         T = Mat4.translation(Vec.of(x,y + torsoHeight + legHeight * 2,z));
         S = Mat4.scale(Vec.of(bodyRadius,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.PI/2, Vec.of(0,0,1));
 
-        Torso = Torso.times(T).times(S);
-        this.shapes['box'].draw(this.gs, Torso,this.bone);
+        Torso = Torso.times(T).times(S).times(R);
+        this.shapes['box'].draw(this.gs, Torso,this.shape_materials['body']);
 
         //Arms
         var Arms;
