@@ -74,6 +74,16 @@ class TreeSegment extends TreePart {
 	return new TreeSegment(0, 0, 0, 0, 0, 0);
     }
 
+    towards(treeSeg2) {
+	return new TreeSegment(treeSeg2.base_length-this.base_length, treeSeg2.base_theta-this.base_theta,
+			       treeSeg2.base_phi-this.base_phi, treeSeg2.end_size-this.end_size,
+			       treeSeg2.end_theta-this.end_theta, treeSeg2.end_phi-this.end_phi);
+    }
+
+    towards_zero_vector() {
+	return new TreeSegment(-this.base_length, -this.base_theta, -this.base_phi, -this.end_size, -this.end_theta, -this.end_phi);
+    }
+    
 }
 
 //Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
@@ -81,7 +91,7 @@ class TreeBranch extends TreePart {
     constructor(branch_point, branch_theta, size_ratio) {
 	super('L(');
 	this.branch_point = branch_point; //where along the parent branch the next branch starts
-	this.branch_theta = branch_theta;
+	this.branch_theta = branch_theta > 0 ? branch_theta : Math.PI*2 -branch_theta;
 	this.size_ratio = size_ratio;
     }
     
@@ -103,6 +113,17 @@ class TreeBranch extends TreePart {
 
     zero_copy() {
 	return new TreeBranch(0, 0, 0);
+    }
+
+    towards(treeBranch2) {
+	let theta = treeBranch2.branch_theta - this.branch_theta;
+	return new TreeBranch(treeBranch2.branch_point - this.branch_point,
+			      theta > 0 ? (theta < Math.PI ? theta : -Math.PI*2 + theta) : (theta > -Math.PI ? theta : Math.PI*2 + theta),
+			      treeBranch2.size_ratio - this.size_ratio);
+    }
+
+    towards_zero_vector() {
+	return new TreeBranch(-this.branch_point, -this.branch_theta, -this.size_ratio);
     }
     
 }
@@ -256,6 +277,8 @@ class TreeProductionRule {
 		    level2++;
 		}
 		else if (rule2.right_hand[i2].to_string() == ')') {
+		    rh_vector.push(rule2.right_hand[i2]);
+		    this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
 		    level2--;
 		}	    
 		i1++;
@@ -263,15 +286,68 @@ class TreeProductionRule {
 	    }
 	    else {
 		//TODO: make the rest of the rh interpolable (right now we just have adding front segments)
-		if (this.right_hand[i1].to_string() != ')') {
-		    rh_vector.push(this.right_hand[i1].zero_copy());
+		if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'I') {
+		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
+		    i1++; i2++;
 		}
-		else rh_vector.push(this.right_hand[i1]);
-		i1++;
+		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'L(') {
+		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
+		    i1++; i2++; level1++; level2++;
+		    rh_vector = rh_vector.concat(this.make_interpolable(i1, rule2, i2));
+		    i1 = this.scan_to_end(i1);
+		    i2 = rule2.scan_to_end(i2);
+		}
+		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'I') {
+		    let current_level = level1;
+		    level1++; i1++;
+		    while (level1 > current_level) {
+			if (rule1.right_hand[i1].to_string() == 'I') {
+			    rh_vector.push(rule1.right_hand[i1].towards_zero_vector());
+			}
+			if (rule1.right_hand[i1].to_string() == 'L(') {
+			    rh_vector.push(rule1.right_hand[i1].towards_zero_vector());
+			    level1++;
+			}
+			else if (rule2.right_hand[i2].to_string() == ')') {
+			    rh_vector.push(rule1.right_hand[i1]);
+			    level1--;
+			}	    
+			i1++;
+			i2++;
+		    }
+		}
+		else if (this.right_hand[i1].to_string() != ')') {
+		    rh_vector.push(this.right_hand[i1].zero_copy());
+		    i1++;
+		    i2++;
+		}
+		else {
+		    rh_vector.push(this.right_hand[i1]);
+		    i1++;
+		    i2++;
+		}
 	    }
 	}
 	this.interp_vector = rh_vector;
+	return rh_vector;
     }
+
+    scan_to_end(i) {
+	let level = 0;
+	while (i < this.right_hand.length) {
+	    if (this.right_hand[i] == 'L(') {
+		level++;
+	    }
+	    else if (this.right_hand[i] == ')') {
+		if (level == 0) {
+		    return i+1;
+		}
+		level--;
+	    }
+	    i++;
+	}
+    }
+	
 }
 
 //rules should increase in max_size from left to right

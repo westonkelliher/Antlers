@@ -155,7 +155,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
-        var ruleQ = new TreeProductionRule(20, [branchA2, segA2, end, segA1, branchA2, segA2, end, segA1, segA3]);
+        var ruleQ = new TreeProductionRule(20, [branchA2, segA3, end, segA1, branchA2, segA2, end, segA3, segA3]);
         this.rule = ruleA;
         this.rule.make_interpolable(0, ruleQ, 0);
 
@@ -167,7 +167,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
     play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
         //this.tree_model.draw(this.gs, R, this.bone);
-        this.rule.interpolate(0);
+        this.rule.interpolate(Math.sin(t)*.004);
         let model = this.rule.get_model();
         model.copy_onto_graphics_card(this.cont.gl);
         model.draw(this.gs, R, this.bone);
