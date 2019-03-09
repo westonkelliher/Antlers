@@ -155,9 +155,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
-        var ruleQ = new TreeProductionRule(20, [branchA2, segA3, end, segA1, branchA2, segA2, end, segA3, segA3]);
+        var ruleQ = new TreeProductionRule(20, [branchA2, segA2, end, segA3, branchB1, segA2, end, segA3]);
         this.rule = ruleA;
-        this.rule.make_interpolable(0, ruleQ, 0);
+        this.rule.make_interpolable(0, ruleC, 0);
 
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
@@ -167,7 +167,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
     play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
         //this.tree_model.draw(this.gs, R, this.bone);
-        this.rule.interpolate(Math.sin(t)*.004);
+        this.rule.interpolate(Math.sin(t)*.006);
         let model = this.rule.get_model();
         model.copy_onto_graphics_card(this.cont.gl);
         model.draw(this.gs, R, this.bone);
@@ -192,17 +192,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.draw_axes(12);
         this.play_demo(t);
 
-        /*
-        // Draw some demo textured shapes
-        let spacing = 6;
-        let m = Mat4.translation(Vec.of(-1 * (spacing / 2) * (this.shape_count - 1), 0, 0));
-        for (let k in this.shapes) {
-            this.shapes[k].draw(
-                graphics_state,
-                m.times(Mat4.rotation(t, Vec.of(0, 1, 0))),
-                this.shape_materials[k] || this.plastic);
-            m = m.times(Mat4.translation(Vec.of(spacing, 0, 0)));
-        }*/
+      
     }
 }
 

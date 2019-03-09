@@ -40,7 +40,10 @@ class TreeSegment extends TreePart {
         var T = Mat4.translation(Vec.of(0, 0, this.base_length));
         var S = Mat4.scale(Vec.of(this.end_size, this.end_size, this.end_size));
         var tilt = Mat4.rotation(this.end_phi, Vec.of(Math.cos(this.end_theta+Math.PI*1/2), Math.sin(this.end_theta+Math.PI*1/2), 0));
-        return m.times(theta).times(phi).times(T).times(S).times(tilt);
+	//let aa = m.times(theta).times(phi).times(T).times(S).times(tilt);
+	let aa = m.times(theta);
+	let bb = aa.times(phi).times(T).times(S).times(tilt);
+        return bb;
     }
     
     draw(m) {
@@ -170,6 +173,13 @@ class RightHand {
 
 
 
+/*
+!!!!                                                                                                  !!!!
+!!!  WARNING: THE CODE BEYOND THIS POINT IS INCOMPREHENSIBLE; DO NOT ATTEMPT TO READ OR UNDERSTAND IT  !!!
+!!!!                                                                                                  !!!!
+*/
+
+
 class TreeProductionRule {
     constructor(max_size, right_hand) {
 	this.right_hand = right_hand; //array of
@@ -185,6 +195,8 @@ class TreeProductionRule {
     }
 
     interpolate(x) {
+	//console.log(this.right_hand);
+	//console.log(this.interp_vector);
 	for (let i = 0; i < this.right_hand.length; i++) {
 	    let k = this.right_hand[i];
 	    let interp = this.interp_vector[i];
@@ -254,8 +266,8 @@ class TreeProductionRule {
     }
     
     
-    // make rh1 interpolable to rh2 but do not modify rh2 (returns an interpolator vector?)
-    // returns a Right Hand which can be summed with interpolable rh1 to produce rh2?
+    // make rh1 interpolable to rh2 but do not modify rh2
+    // returns a Right Hand which can be summed with interpolable rh1 to produce rh2
     make_interpolable(i1, rule2, i2) {
 	let segi1 = 0;
 	let segi2 = 0;
@@ -285,6 +297,7 @@ class TreeProductionRule {
 		i2++;
 	    }
 	    else {
+
 		//TODO: make the rest of the rh interpolable (right now we just have adding front segments)
 		if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'I') {
 		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
@@ -298,21 +311,48 @@ class TreeProductionRule {
 		    i2 = rule2.scan_to_end(i2);
 		}
 		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'I') {
+		    rh_vector.push(this.right_hand[i1].towards_zero_vector());
 		    let current_level = level1;
 		    level1++; i1++;
 		    while (level1 > current_level) {
-			if (rule1.right_hand[i1].to_string() == 'I') {
-			    rh_vector.push(rule1.right_hand[i1].towards_zero_vector());
+			if (this.right_hand[i1].to_string() == 'I') {
+			    rh_vector.push(this.right_hand[i1].towards_zero_vector());
 			}
-			if (rule1.right_hand[i1].to_string() == 'L(') {
-			    rh_vector.push(rule1.right_hand[i1].towards_zero_vector());
+			if (this.right_hand[i1].to_string() == 'L(') {
+			    rh_vector.push(this.right_hand[i1].towards_zero_vector());
 			    level1++;
 			}
-			else if (rule2.right_hand[i2].to_string() == ')') {
-			    rh_vector.push(rule1.right_hand[i1]);
+			else if (this.right_hand[i1].to_string() == ')') {
+			    rh_vector.push(this.right_hand[i1]);
 			    level1--;
-			}	    
+			}
 			i1++;
+		    }
+		}
+		else if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'L(') {
+		    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
+		    i1++;
+		    rh_vector.push(rule2.right_hand[i2].no_length_vector());
+		    let current_level = level2;
+		    level2++; i2++;
+		    while (level2 > current_level) {
+			if (rule2.right_hand[i2].to_string() == 'I') {
+			    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
+			    i1++;
+			    rh_vector.push(rule2.right_hand[i2].no_length_vector());
+			}
+			if (rule2.right_hand[i2].to_string() == 'L(') {
+			    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
+			    i1++;
+			    rh_vector.push(this.right_hand[i1].no_length_vector());
+			    level2++;
+			}
+			else if (rule2.right_hand[i2].to_string() == ')') {
+			    this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
+			    i1++;
+			    rh_vector.push(rule2.right_hand[i2]);
+			    level2--;
+			}
 			i2++;
 		    }
 		}
