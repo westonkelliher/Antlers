@@ -86,6 +86,10 @@ class TreeSegment extends TreePart {
     towards_zero_vector() {
 	return new TreeSegment(-this.base_length, -this.base_theta, -this.base_phi, -this.end_size, -this.end_theta, -this.end_phi);
     }
+
+    copy() {
+	return new TreeSegment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
+    }
     
 }
 
@@ -128,6 +132,10 @@ class TreeBranch extends TreePart {
     towards_zero_vector() {
 	return new TreeBranch(-this.branch_point, -this.branch_theta, -this.size_ratio);
     }
+
+    copy() {
+	return new TreeBranch(this.branch_point, this.branch_theta, this.size_ratio);
+    }
     
 }
 
@@ -135,42 +143,10 @@ class TreeBranchEnd extends TreePart {
     constructor() {
 	super(')');
     }
-}
-
-
-class RightHand {
-    constructor(parts) {
-	this.parts = parts;
-    }
-
-    front_append_segment(base_theta, end_theta) {
-	this.parts.unshift(new TreeSegment(0, base_theta, 0, 1, end_theta, 0));
-    }
-    
-    num_segments() {
-	let num = 0;
-	let level = 0;
-	for (let i = 0; i < parts.length; i++) {
-	    if (level == 0 && parts[i].symbol == 'I') {
-		num++;
-	    }
-	    else if (parts[i].symbol == 'L(') {
-		level++;
-	    }
-	    else if (parts[i].symbol == ')') {
-		level--;
-	    }
-	}
-	return num;
-    }
-    
-    make_interpolable(target) {
-	let segs_greater = this.num_segments - target.num_segments();
-	while (segs_greater < 0) {
-	}
+    copy() {
+	return new TreeBranchEnd();
     }
 }
-
 
 
 /*
@@ -180,12 +156,12 @@ class RightHand {
 */
 
 
-class TreeProductionRule {
+class TreeRule {
     constructor(max_size, right_hand) {
 	this.right_hand = right_hand; //array of
 	this.max_size = max_size;
     }
-
+    
     init(gl, gs, material) {
 	for (let i = 0; i < this.right_hand.length; i++) {
 	    if (this.right_hand[i].to_string() == 'I' || this.right_hand[i].to_string() == 'v') {
@@ -193,12 +169,21 @@ class TreeProductionRule {
 	    }
 	}
     }
-
-    interpolate(x) {
+    
+    copy() {
+	let rh = [];
+	for (let i = 0; i < this.right_hand.length; i++) {
+	    rh.push(this.right_hand[i].copy());
+	}
+	return new TreeRule(this.max_size, rh);   
+    }
+    
+    interpolated_copy(x) {
 	//console.log(this.right_hand);
 	//console.log(this.interp_vector);
-	for (let i = 0; i < this.right_hand.length; i++) {
-	    let k = this.right_hand[i];
+	let rule = this.copy()
+	for (let i = 0; i < rule.right_hand.length; i++) {
+	    let k = rule.right_hand[i];
 	    let interp = this.interp_vector[i];
 	    if (k.to_string() == 'I' || k.to_string() == 'v') {
 		k.base_length += interp.base_length*x;
@@ -214,17 +199,18 @@ class TreeProductionRule {
 		k.size_ratio += interp.size_ratio*x;
             }
 	}
+	return rule;
     }
     
-    get_model() {
+    get_model(x) {
+	let cpy = this.interpolated_copy(x);
 	var m = Mat4.identity();
 	var size = 1;
 	var subshapes = [];
 	var size_stack = [];
 	var matrix_stack = [];
-	for (let j = 0; j < this.right_hand.length; j++) {
-	    var k = this.right_hand[j];
-	    var interp = this.interp_vector[j];
+	for (let j = 0; j < cpy.right_hand.length; j++) {
+	    var k = cpy.right_hand[j];
 	    if (k.to_string() == 'I') {
 		size *= k.end_size;
 		subshapes.push([m, k.get_model()]);
@@ -252,7 +238,7 @@ class TreeProductionRule {
 	let num = 0;
 	let level = 0;
 	for (; i < this.right_hand.length && level >= 0; i++) {
-	    if (level == 0 && this.right_hand[i].symbol == 'I') {
+	    if (level == 0 && (this.right_hand[i].symbol == 'I' || this.right_hand[i].symbol == 'v') ) {
 		num++;
 	    }
 	    else if (this.right_hand[i].symbol == 'L(') {
@@ -268,7 +254,10 @@ class TreeProductionRule {
     
     // make rh1 interpolable to rh2 but do not modify rh2
     // returns a Right Hand which can be summed with interpolable rh1 to produce rh2
-    make_interpolable(i1, rule2, i2) {
+    make_interpolable(rule2) {
+	this.private_make_interpolable(0, rule2, 0);
+    }	
+    private_make_interpolable(i1, rule2, i2) {
 	let segi1 = 0;
 	let segi2 = 0;
 	let level1 = 0;
@@ -282,7 +271,7 @@ class TreeProductionRule {
 		    rh_vector.push(rule2.right_hand[i2].no_length_vector());
 		    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 		}
-		if (level2 == 0 && rule2.right_hand[i2].to_string() == 'I') {
+		if (level2 == 0 && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v')) {
 		    segi1++;
 		}
 		else if (rule2.right_hand[i2].to_string() == 'L(') {
@@ -298,23 +287,23 @@ class TreeProductionRule {
 	    }
 	    else {
 
-		if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'I') {
+		if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
 		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
 		    i1++; i2++;
 		}
 		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'L(') {
 		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
 		    i1++; i2++; level1++; level2++;
-		    rh_vector = rh_vector.concat(this.make_interpolable(i1, rule2, i2));
+		    rh_vector = rh_vector.concat(this.private_make_interpolable(i1, rule2, i2));
 		    i1 = this.scan_to_end(i1);
 		    i2 = rule2.scan_to_end(i2);
 		}
-		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'I') {
+		else if (this.right_hand[i1].to_string() == 'L(' && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
 		    rh_vector.push(this.right_hand[i1].towards_zero_vector());
 		    let current_level = level1;
 		    level1++; i1++;
 		    while (level1 > current_level) {
-			if (this.right_hand[i1].to_string() == 'I') {
+			if (this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') {
 			    rh_vector.push(this.right_hand[i1].towards_zero_vector());
 			}
 			if (this.right_hand[i1].to_string() == 'L(') {
@@ -328,14 +317,14 @@ class TreeProductionRule {
 			i1++;
 		    }
 		}
-		else if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'L(') {
+		else if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && rule2.right_hand[i2].to_string() == 'L(') {
 		    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 		    i1++;
 		    rh_vector.push(rule2.right_hand[i2].no_length_vector());
 		    let current_level = level2;
 		    level2++; i2++;
 		    while (level2 > current_level) {
-			if (rule2.right_hand[i2].to_string() == 'I') {
+			if (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') {
 			    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 			    i1++;
 			    rh_vector.push(rule2.right_hand[i2].no_length_vector());
@@ -354,11 +343,6 @@ class TreeProductionRule {
 			}
 			i2++;
 		    }
-		}
-		else if (this.right_hand[i1].to_string() != ')') {
-		    rh_vector.push(this.right_hand[i1].zero_copy());
-		    i1++;
-		    i2++;
 		}
 		else {
 		    rh_vector.push(this.right_hand[i1]);
@@ -398,21 +382,28 @@ class TreeProduction {
     init(gl, gs, material) {
 	for (let i = 0; i < this.rules.length; i++) {
 	    this.rules[i].init(gl, gs, material);
+	    if (i != 0) {
+		this.rules[i].make_interpolable(this.rules[i-1]);
+	    }
 	}
     }
     
-    draw_tree(size, m) {
+    /*draw_tree(size, m) {
 	var size_stack = [];
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
 	    if (size <= this.rules[i].max_size) {
-		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
-		    var k = this.rules[i].right_hand[j];
+		if (i != 0) {
+		    let rule_depth = (size-this.rules[i-1].max_size)/(this.rules[i].max_size-this.rules[i-1].max_size);
+		}
+		let rule = i == 0 ? this.rules[i] : this.rules[i].interpolable_copy();
+		for (let j = 0; j < rule.right_hand.length; j++) {
+		    var k = rule.right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
 			k.draw(m);
 			m = k.next_matrix(m);
-			if (j == this.rules[i].right_hand.length-1) {
+			if (j == rule.right_hand.length-1) {
 			    this.draw_tree(size, m)
 			}
 		    }
@@ -438,7 +429,7 @@ class TreeProduction {
 	    }
 	}
     }
-
+*/
     //Basically we're currying here
     get_model() {
 	return this.private_get_model(1, Mat4.identity());
@@ -450,8 +441,16 @@ class TreeProduction {
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
 	    if (size <= this.rules[i].max_size) {
+		let rule_depth = 0;
+		let rule = this.rules[i];
+		if (i != 0) {
+		    console.log(size+' '+this.rules[i-1].max_size+' '+this.rules[i].max_size);
+		    rule_depth = 1 - (size-this.rules[i-1].max_size)/(this.rules[i].max_size-this.rules[i-1].max_size);
+		    console.log(rule_depth);
+		    rule = this.rules[i].interpolated_copy(rule_depth);
+		}
 		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
-		    var k = this.rules[i].right_hand[j];
+		    var k = rule.right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
 			subshapes.push([m, k.get_model()]);
