@@ -43,15 +43,6 @@ class StaticSegment extends StaticPart {
         return m.times(theta).times(phi).times(T).times(S).times(tilt);
     }
     
-    draw(m) {
-	if (!this.gpu_loaded) {
-	    this.shape = new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
-	    this.shape.copy_onto_graphics_card(this.gl);
-	    this.gpu_loaded = true;
-	}
-	this.shape.draw(this.gs, m, this.material);
-    }
-
     get_model() {
 	return new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
@@ -110,43 +101,7 @@ class StaticTree {
 	}
     }
     
-    draw_tree(size, m) {
-	var size_stack = [];
-	var matrix_stack = [];
-	for (let i = 0; i < this.rules.length; i++) {
-	    if (size <= this.rules[i].max_size) {
-		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
-		    var k = this.rules[i].right_hand[j];
-		    if (k.to_string() == 'I') {
-			size *= k.end_size;
-			k.draw(m);
-			m = k.next_matrix(m);
-			if (j == this.rules[i].right_hand.length-1) {
-			    this.draw_tree(size, m)
-			}
-		    }
-		    else if (k.to_string() == 'L(') {
-			size_stack.push(size);
-			size *= k.size_ratio;
-			matrix_stack.push(m);
-			m = k.next_matrix(m)
-		    }
-		    else if (k.to_string() == ')') {
-			if (size != 0) {
-			    this.draw_tree(size, m)
-			}
-			size = size_stack.pop();
-			m = matrix_stack.pop();
-		    }
-		    else if (k.to_string() == 'v') {
-			size = 0;
-			k.draw(m);
-		    }
-		}
-		break;
-	    }
-	}
-    }
+
 
     //Basically we're currying here
     get_model() {
