@@ -298,7 +298,6 @@ class TreeProductionRule {
 	    }
 	    else {
 
-		//TODO: make the rest of the rh interpolable (right now we just have adding front segments)
 		if (this.right_hand[i1].to_string() == 'I' && rule2.right_hand[i2].to_string() == 'I') {
 		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
 		    i1++; i2++;
@@ -476,7 +475,6 @@ class TreeProduction {
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			let R = Mat4.rotation(k.base_rotation, Vec.of(0, 0, 1));			
 			subshapes.push([m, k.get_model()]);
 		    }
 		}

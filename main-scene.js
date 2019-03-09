@@ -157,7 +157,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var ruleQ = new TreeProductionRule(20, [branchA2, segA2, end, segA3, branchB1, segA2, end, segA3]);
         this.rule = ruleA;
-        this.rule.make_interpolable(0, ruleC, 0);
+        this.rule.make_interpolable(0, ruleQ, 0);
 
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
