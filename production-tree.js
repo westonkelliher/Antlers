@@ -13,8 +13,12 @@ class TreeSegment extends TreePart {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	if (end_size == undefined || end_size == 0) { //spike
 	    super('v');
-	    this.model_type = Spike;
+	    this.model_type = Leaf;
 	}
+// 	else if(end_size == 1 && (end_theta = 0 || end_theta == undefined)){
+// 		super('v');
+// 	    this.model_type = Leaf;
+// 	}
 	else {
 	    super('I');
 	    this.model_type = Segment;
@@ -56,6 +60,7 @@ class TreeSegment extends TreePart {
 	return new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
 }
+
 
 //Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
 class TreeBranch extends TreePart {
