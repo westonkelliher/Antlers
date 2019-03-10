@@ -149,7 +149,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.rule = ruleA;
     
         this.tree_prod = tree_prod;
-        
+
     }
 
     play_demo(t) {
@@ -158,13 +158,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.tree_model = this.tree_prod.private_get_model(.3+((t%15)/15)*.7, Mat4.identity());
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
         this.tree_model.draw(this.gs, R, this.bone);
-        //let model = this.rule.get_model(Math.sin(t)*.5+.5);
-        //model.copy_onto_graphics_card(this.cont.gl);
-        //model.draw(this.gs, R, this.bone);
-        //var T = Mat4.translation(Vec.of(10, 10, 0));
-        //this.tree_prod.init(this.cont.gl, this.gs, this.bone);
-        //this.tree_prod.draw_tree(1, T.times(R));
-        
     }
 
 
@@ -182,7 +175,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.draw_axes(12);
         this.play_demo(t);
 
-      
     }
 }
 
