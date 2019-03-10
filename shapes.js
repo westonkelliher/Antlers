@@ -58,6 +58,95 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
     }
 }
 
+window.Leaf = window.classes.Leaf = class Leaf extends Spike {
+    constructor(base_length, base_theta, base_phi) {
+        super("positions", "normals");
+        
+        var n = 20;
+        var remainder = base_theta%(Math.PI*2/n);
+        var m = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+
+        var len = 10;
+        var wid = 5;
+
+//        right side
+        var w = 0;
+        var l = len;
+
+        this.positions.push([0,0,0]);
+        this.normals.push([0,0,-1]);
+
+        for (let i = 0; i < n; i++){
+                
+                if(i < 1/2*n){
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3());
+                    this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3()); 
+                    w = w+wid/n;
+                    l = l-len/n;
+
+                }
+                else{
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
+                }
+
+               
+                this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
+                this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+        }
+
+
+
+        for (let i = 0; i < 3*n; i++){
+           this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
+        }
+
+//         left side
+        var w = 0;
+        var l = len;
+
+        var m = Mat4.rotation(0*Math.PI, Vec.of(0, 0, 1));
+     
+
+        for (let i = 0; i < n; i++){
+            if(i < 1/2*n){
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3());
+                    this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3()); 
+                    w = w+wid/n;
+                    l = l-len/n;
+
+                }
+                else{
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
+                }
+
+               
+                this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
+                this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+        }
+
+
+
+        for (let i = 3*n; i < 6*n; i++){
+           this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
+        }
+
+    }
+}
+
 
 window.Grape = window.classes.Grape = class Grape extends Spike {
     constructor(base_length, base_theta, base_phi) {
