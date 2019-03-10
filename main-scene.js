@@ -125,31 +125,38 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-        var end = new StaticBranchEnd();
-        var spike0 = new StaticSegment(6, Math.PI*0, -Math.PI*1/8);
-        var segA1 = new StaticSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new StaticBranch(1.5, Math.PI*0, .95);
-        var segA2 = new StaticSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
-        var segA3 = new StaticSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
-        var branchB1 = new StaticBranch(-.2, Math.PI*0, .69);
-        var branchB2 = new StaticBranch(-.2, Math.PI*2/5, .7);
-        var branchB3 = new StaticBranch(-.2, Math.PI*4/5, .71);
-        var branchB4 = new StaticBranch(-.2, Math.PI*6/5, .73);
-        var branchB5 = new StaticBranch(-.2, Math.PI*8/5, .72);
-        var segC1 = new StaticSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
-        var segC2 = new StaticSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
-        var b_c = .45;
-        var ruleA = new StaticRule(20, [branchA2, segA2, end, segA1, segA3]);
-        var ruleB = new StaticRule(b_c, [branchB1, end, branchB2, end,
-                                            branchB3, end, branchB4, end, branchB5, end])
-        var ruleC = new StaticRule(b_c*.8, [segC1, segC2, spike0]);
-        var tree_prod = new StaticTree([ruleC, ruleB, ruleA]);
-        this.tree_model = tree_prod.get_model();
-        this.tree_model.copy_onto_graphics_card(this.cont.gl);
+        var end = new GrowingBranchEnd();
+
+        var seg0 = new GrowingSegment(6, Math.PI*0, 0, 0, 0 ,0);
+        var seg1 = new GrowingSegment(4, -Math.PI*.1, Math.PI*0, .95, -Math.PI*0.6, Math.PI*1/10);
+        var seg2 = new GrowingSegment(4, Math.PI*.9, Math.PI*.2, .8, Math.PI*.7, Math.PI*1/11);
+        var seg3 = new GrowingSegment(5, Math.PI*0, Math.PI*.05, .8, Math.PI*.4, Math.PI*1/9);
+        var seg4 = new GrowingSegment(5, Math.PI*1.1, Math.PI*.1, .8, Math.PI*0, Math.PI*1/9);
+
+        var branch1 = new GrowingBranch(1, Math.PI*1.2, .4);
+        var branch2 = new GrowingBranch(1.5, Math.PI*.3, .95);
+
+        var b_c = .6;
+        var ruleA = new GrowingRule(1, [branch1, seg2, end, seg1, branch2, seg2, end, seg3]);
+        var ruleB = new GrowingRule(b_c, [seg1, branch2, seg2, end, seg1])
+        var ruleC = new GrowingRule(b_c*b_c, [seg1, seg0]);
+
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
+        tree_prod.init(this.cont.gl, this.gs, this.bone);
+
+        var rule0 = new GrowingRule(0, []);
+        ruleA.make_interpolable(ruleB);
+        this.rule = ruleA;
+    
+        this.tree_prod = tree_prod;
+
     }
 
-    play_demo() {
+    play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
+        
+        this.tree_model = this.tree_prod.private_get_model(.3+((t%15)/15)*.7, Mat4.identity());
+        this.tree_model.copy_onto_graphics_card(this.cont.gl);
         this.tree_model.draw(this.gs, R, this.bone);
     }
 
@@ -166,9 +173,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //draw axes
         this.draw_axes(12);
-
-	//draw example StaticTree
-	this.play_demo();
+        this.play_demo(t);
 
     }
 }

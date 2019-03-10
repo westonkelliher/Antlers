@@ -1,5 +1,5 @@
 //Tree Part - superclass
-class TreePart {
+class GrowingPart {
     constructor(symbol) {
 	this.symbol = symbol
     }
@@ -8,8 +8,8 @@ class TreePart {
     }
 }
 
-//Tree Segment - a segment node
-class TreeSegment extends TreePart {
+//Growing Segment - a segment node
+class GrowingSegment extends GrowingPart {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	if (end_size == undefined || end_size == 0) { //spike
 	    super('v');
@@ -66,35 +66,35 @@ class TreeSegment extends TreePart {
     }
 
     no_length_copy() {
-	return new TreeSegment(0, this.base_theta, 0, 1, this.end_theta, 0);
+	return new GrowingSegment(0, this.base_theta, 0, 1, this.end_theta, 0);
     }
 
     no_length_vector() {
-	return new TreeSegment(this.base_length, 0, this.base_phi, this.end_size-1, 0, this.end_phi);
+	return new GrowingSegment(this.base_length, 0, this.base_phi, this.end_size-1, 0, this.end_phi);
     }
 
     zero_copy() {
-	return new TreeSegment(0, 0, 0, 0, 0, 0);
+	return new GrowingSegment(0, 0, 0, 0, 0, 0);
     }
 
     towards(treeSeg2) {
-	return new TreeSegment(treeSeg2.base_length-this.base_length, treeSeg2.base_theta-this.base_theta,
+	return new GrowingSegment(treeSeg2.base_length-this.base_length, treeSeg2.base_theta-this.base_theta,
 			       treeSeg2.base_phi-this.base_phi, treeSeg2.end_size-this.end_size,
 			       treeSeg2.end_theta-this.end_theta, treeSeg2.end_phi-this.end_phi);
     }
 
     towards_zero_vector() {
-	return new TreeSegment(-this.base_length, -this.base_theta, -this.base_phi, -this.end_size, -this.end_theta, -this.end_phi);
+	return new GrowingSegment(-this.base_length, -this.base_theta, -this.base_phi, -this.end_size, -this.end_theta, -this.end_phi);
     }
 
     copy() {
-	return new TreeSegment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
+	return new GrowingSegment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
     
 }
 
-//Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
-class TreeBranch extends TreePart {
+//Growing Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
+class GrowingBranch extends GrowingPart {
     constructor(branch_point, branch_theta, size_ratio) {
 	super('L(');
 	this.branch_point = branch_point; //where along the parent branch the next branch starts
@@ -111,41 +111,41 @@ class TreeBranch extends TreePart {
     }
 
     no_length_copy() {
-	return new TreeBranch(0, this.branch_theta, 0);
+	return new GrowingBranch(0, this.branch_theta, 0);
     }
 
     no_length_vector() {
-	return new TreeBranch(this.branch_point, 0, this.size_ratio);
+	return new GrowingBranch(this.branch_point, 0, this.size_ratio);
     }
 
     zero_copy() {
-	return new TreeBranch(0, 0, 0);
+	return new GrowingBranch(0, 0, 0);
     }
 
     towards(treeBranch2) {
 	let theta = treeBranch2.branch_theta - this.branch_theta;
-	return new TreeBranch(treeBranch2.branch_point - this.branch_point,
+	return new GrowingBranch(treeBranch2.branch_point - this.branch_point,
 			      //theta > 0 ? (theta < Math.PI ? theta : -Math.PI*2 + theta) : (theta > -Math.PI ? theta : Math.PI*2 + theta),
 			      treeBranch2.branch_theta - this.branch_theta,
 			      treeBranch2.size_ratio - this.size_ratio);
     }
 
     towards_zero_vector() {
-	return new TreeBranch(-this.branch_point, -this.branch_theta, -this.size_ratio);
+	return new GrowingBranch(-this.branch_point, -this.branch_theta, -this.size_ratio);
     }
 
     copy() {
-	return new TreeBranch(this.branch_point, this.branch_theta, this.size_ratio);
+	return new GrowingBranch(this.branch_point, this.branch_theta, this.size_ratio);
     }
     
 }
 
-class TreeBranchEnd extends TreePart {
+class GrowingBranchEnd extends GrowingPart {
     constructor() {
 	super(')');
     }
     copy() {
-	return new TreeBranchEnd();
+	return new GrowingBranchEnd();
     }
 }
 
@@ -157,7 +157,7 @@ class TreeBranchEnd extends TreePart {
 */
 
 
-class TreeRule {
+class GrowingRule {
     constructor(max_size, right_hand) {
 	this.right_hand = right_hand; //array of
 	this.max_size = max_size;
@@ -176,7 +176,7 @@ class TreeRule {
 	for (let i = 0; i < this.right_hand.length; i++) {
 	    rh.push(this.right_hand[i].copy());
 	}
-	return new TreeRule(this.max_size, rh);   
+	return new GrowingRule(this.max_size, rh);   
     }
     
     interpolated_copy(x) {
@@ -375,7 +375,7 @@ class TreeRule {
 }
 
 //rules should increase in max_size from left to right
-class TreeProduction {
+class GrowingTree {
     constructor(rules) {
 	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
     }
