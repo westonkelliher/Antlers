@@ -14,7 +14,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         // Locate the camera here (inverted matrix).
         const r = context.width / context.height;
         
-        context.globals.graphics_state.camera_transform = Mat4.translation([0,-1,-35]);
+        context.globals.graphics_state.camera_transform = Mat4.translation([1,-1,-32.5]);
         context.globals.graphics_state.projection_transform = Mat4.perspective(Math.PI / 4, r, .1, 1000);
 
         // At the beginning of our program, load one of each of these shape
@@ -381,25 +381,57 @@ class Assignment_Two_Skeleton extends Scene_Component {
 //              this.gs.camera_transform = M1.times(T1);//.times(T2);
 
         this.createPerson(4.6,0.2,1.2,t);
-        var Arrow; let T; let S; let R;
+        var Arrow; let T; let T1; let S; let R;
+    
+         Arrow = Mat4.identity();
+         let starting_distance = 30;
+         let arrow_head_length = .05;
+        let arrow_length = arrow_head_length * 250;
+        let arrow_body_radius = 1;
 
-        let arrow_head_length = .05;
-        Arrow = Mat4.identity();
-        T = Mat4.translation(Vec.of(0,1,30));
+        //if(t > 3){
+
+        var translation = t;
+            
+            if(t < 8){
+                T = Mat4.translation(Vec.of(0,0, -translation * 10));
+            }
+        //}
+        if (t > 8){
+             T = Mat4.translation(Vec.of(0,0,-starting_distance + arrow_body_radius ));
+        }
+        Arrow = Arrow.times(T);
+
+
+        
+       
+        T = Mat4.translation(Vec.of(0,1,starting_distance));
         S = Mat4.scale(Vec.of(arrow_head_length,arrow_head_length,arrow_head_length));
         R = Mat4.rotation(Math.PI, Vec.of(0,1,0));
 
         Arrow = Arrow.times(T).times(S).times(R);
-        this.shapes['Arrowhead'].draw(this.gs, Arrow,this.bone);
+        this.shapes['Arrowhead'].draw(this.gs, Arrow,this.antlers);
 
-        let arrow_length = arrow_head_length * 250;
-        let arrow_body_radius = 1;
+        
         T = Mat4.translation(Vec.of(0,0,-arrow_length));
         S = Mat4.scale(Vec.of(arrow_body_radius,arrow_body_radius,arrow_length));
         Arrow = Arrow.times(T).times(S);
-        this.shapes['cylinder'].draw(this.gs, Arrow,this.bone);
+        this.shapes['cylinder'].draw(this.gs, Arrow,this.antlers);
 
+        Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,-arrow_length/12.5)));
+        this.shapes['circle'].draw(this.gs, Arrow,this.antlers);
 
+                Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,arrow_length/12.5)));
+
+        R = Mat4.rotation(Math.PI/4, Vec.of(0,0,1));
+        S = Mat4.scale(Vec.of(.2,1,0.2));
+        T = Mat4.translation(Vec.of(0, arrow_body_radius * 2, -1));
+        Arrow = Arrow.times(R).times(T).times(S);
+        this.shapes['box'].draw(this.gs, Arrow,this.bone);
+
+        T = Mat4.translation(Vec.of(0, arrow_body_radius * -4, 0));
+        Arrow = Arrow.times(T);
+        this.shapes['box'].draw(this.gs, Arrow,this.bone);
         
         
 
