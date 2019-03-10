@@ -129,22 +129,26 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var seg0 = new GrowingSegment(0, 0, 0, 1, 0 ,0);
         var branch0 = new GrowingBranch(0, 0, 0);
-        var spike = new GrowingSegment(4, 0, 0, 0, 0, 0);
+        var spike1 = new GrowingSegment(4, 0, 0, 0, 0, 0);
+        var spike2 = new GrowingSegment(5, 0, 0, 0, 0, 0);
 
         var seg1 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, -Math.PI*0, Math.PI*0);
         var seg2 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
         var seg3 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
         var seg4 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
-        var seg5 = new GrowingSegment(6, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
-        var seg6 = new GrowingSegment(6, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
+        var seg5 = new GrowingSegment(6, Math.PI*0, -Math.PI*.1, .87, Math.PI*0, Math.PI*0);
+        var seg6 = new GrowingSegment(6, Math.PI*0, -Math.PI*.15, .87, Math.PI*0, Math.PI*0);
 
-        var branch1 = new GrowingBranch(2, -Math.PI*0, .8);
-        var branch2 = new GrowingBranch(2, Math.PI*1, .8);
+        var branch1 = new GrowingBranch(2, Math.PI*0, .8);
+        var branch2 = new GrowingBranch(2, -Math.PI*1, .8);
+        var branch3 = new GrowingBranch(2, Math.PI*0, .5);
+        var branch4 = new GrowingBranch(2, -Math.PI*2/3, .5);
+        var branch5 = new GrowingBranch(2, -Math.PI*4/3, .5);
 
-        var b_c = .4;
+        var b_c = .35;
         var ruleA = new GrowingRule(1, [seg1, branch1, seg5, end, seg2, branch2, seg6, end, seg4]);
-        var ruleB = new GrowingRule(b_c, [branch1, seg5, end, seg4])
-        var ruleC = new GrowingRule(b_c*b_c, [spike]);
+        var ruleB = new GrowingRule(b_c, [branch3, end, branch4, end, branch5, end, spike2])
+        var ruleC = new GrowingRule(b_c*b_c, [spike1]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
         tree_prod.init(this.cont.gl, this.gs, this.bone);
@@ -159,8 +163,11 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        
-        this.tree_model = this.tree_prod.private_get_model((t%15)/15, Mat4.identity());
+        let period = 5;
+        let rootp = Math.cbrt(period);
+        if (t%(period) < period) {
+            this.tree_model = this.tree_prod.private_get_model(.22+(Math.cbrt(t%period)/rootp)*.78, Mat4.identity());
+        }
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
         this.tree_model.draw(this.gs, R, this.bone);
     }

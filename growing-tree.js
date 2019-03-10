@@ -172,8 +172,8 @@ class GrowingRule {
     }
     
     interpolated_copy(x) {
-	console.log(this.right_hand);
-	console.log(this.interp_vector);
+	//console.log(this.right_hand);
+	//console.log(this.interp_vector);
 	let rule = this.copy()
 	for (let i = 0; i < rule.right_hand.length; i++) {
 	    let k = rule.right_hand[i];
@@ -256,13 +256,10 @@ class GrowingRule {
 	let level1 = 0;
 	let level2 = 0;
 	let n_segs1 = this.num_segs(i1);
-	//console.log('o');
 	let n_segs2 = rule2.num_segs(i2);
-	//console.log("__"+this.right_hand+ ' '+rule2);
 	let rh_vector = [];
 	
 	while (segi1 < n_segs2-n_segs1) {
-	    console.log('bdhjefefhb');
 	    if (rule2.right_hand[i2].to_string() != ')') {
 		rh_vector.push(rule2.right_hand[i2].no_length_vector());
 		this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
@@ -299,29 +296,21 @@ class GrowingRule {
 	    i1++;
 	}
 
-	console.log(rh_vector);
 	while (i1 < this.right_hand.length && i2 < rule2.right_hand.length) {
-	    //console.log('bap');
 	    if (this.right_hand[i1].to_string() == ')' && rule2.right_hand[i2].to_string() == ')' && level1 == 0 && level2 == 0) {
-		//console.log('hitting both ends');
 		rh_vector.push(this.right_hand[i1]);
 		break;
 	    }
 	    if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
-		//console.log("both segs");
 		rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
 		i1++; i2++;
-		//console.log(i1+" "+i2);
 		}
 	    else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'L(') {
 		rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
 		i1++; i2++;
-		//console.log('recurs');
 		rh_vector = rh_vector.concat(this.private_make_interpolable(i1, rule2, i2));
-		//console.log(i1 + " " + i2);
 		i1 = this.scan_to_end(i1);
 		i2 = rule2.scan_to_end(i2);
-		//console.log(i1 + " " + i2);
 	    }
 	    else if (this.right_hand[i1].to_string() == 'L(' && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
 		rh_vector.push(this.right_hand[i1].towards(this.right_hand[i1].zero_copy()));
@@ -343,8 +332,6 @@ class GrowingRule {
 		}
 	    }
 	    else if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && rule2.right_hand[i2].to_string() == 'L(') {
-		//console.log("1 seg  2 branch");
-		//console.log(i1+' '+i2);
 		this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 		i1++;
 		rh_vector.push(rule2.right_hand[i2].no_length_vector());
@@ -372,16 +359,12 @@ class GrowingRule {
 		}
 	    }
 	    else {
-		//console.log('bad');
 		rh_vector.push(this.right_hand[i1]);
 		i1++;
 		i2++;
 	    }
-	    //console.log(this.right_hand.length+ "-");
 	}
-	//console.log('end of while');
 
-	//console.log(rh_vector);
 	this.interp_vector = rh_vector;
 	return rh_vector;
     }
