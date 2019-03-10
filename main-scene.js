@@ -127,19 +127,32 @@ class Assignment_Two_Skeleton extends Scene_Component {
     initialize_demo() {
         var end = new GrowingBranchEnd();
 
-        var seg0 = new GrowingSegment(6, Math.PI*0, 0, 0, 0 ,0);
-        var seg1 = new GrowingSegment(4, -Math.PI*.1, Math.PI*0, .95, -Math.PI*0.6, Math.PI*1/10);
-        var seg2 = new GrowingSegment(4, Math.PI*.9, Math.PI*.2, .8, Math.PI*.7, Math.PI*1/11);
-        var seg3 = new GrowingSegment(5, Math.PI*0, Math.PI*.05, .8, Math.PI*.4, Math.PI*1/9);
-        var seg4 = new GrowingSegment(5, Math.PI*1.1, Math.PI*.1, .8, Math.PI*0, Math.PI*1/9);
+        var seg0 = new GrowingSegment(0, 0, 0, 1, 0 ,0);
+        var branch0 = new GrowingBranch(0, 0, 0);
+        var spike1 = new GrowingSegment(4, 0, 0, 0, 0, 0);
+        var spike2 = new GrowingSegment(7, 0, 0, 0, 0, 0);
 
-        var branch1 = new GrowingBranch(1, Math.PI*1.2, .4);
-        var branch2 = new GrowingBranch(1.5, Math.PI*.3, .95);
+        var seg1 = new GrowingSegment(4, Math.PI*0, Math.PI*-.15, .87, -Math.PI*0, Math.PI*0);
+        var seg2 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, -Math.PI*0);
+        var seg3 = new GrowingSegment(4, -Math.PI*.7, Math.PI*.05, .87, Math.PI*0, Math.PI*0);
+        var seg4 = new GrowingSegment(6, Math.PI*0, -Math.PI*.05, .5, Math.PI*0, Math.PI*0);
+        var seg5 = new GrowingSegment(6, Math.PI*0, -Math.PI*.05, .5, Math.PI*0, Math.PI*.05);
+        var seg6 = new GrowingSegment(6, Math.PI*0, -Math.PI*.15, .87, Math.PI*0, Math.PI*.05);
+        var seg7 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
+        var seg8 = new GrowingSegment(6, Math.PI*0, -Math.PI*.1, .87, Math.PI*0, Math.PI*0);
+        var seg9 = new GrowingSegment(6, Math.PI*0, -Math.PI*.15, .87, Math.PI*0, Math.PI*0);
 
-        var b_c = .6;
-        var ruleA = new GrowingRule(1, [branch1, seg2, end, seg1, branch2, seg2, end, seg3]);
-        var ruleB = new GrowingRule(b_c, [seg1, branch2, seg2, end, seg1])
-        var ruleC = new GrowingRule(b_c*b_c, [seg1, seg0]);
+        var branch1 = new GrowingBranch(2, Math.PI*.9, .75);
+        var branch2 = new GrowingBranch(2, -Math.PI*1, .75);
+        var branch3 = new GrowingBranch(2, Math.PI*0, .5);
+        var branch4 = new GrowingBranch(2, -Math.PI*2/3, .5);
+        var branch5 = new GrowingBranch(2, -Math.PI*4/3, .5);
+
+        var a_b = .5;
+        var b_c = .4;
+        var ruleA = new GrowingRule(1, [branch1, seg1, end, seg2, branch3, end, seg3]);
+        var ruleB = new GrowingRule(a_b, [branch1, seg1, end, seg2, seg3])
+        var ruleC = new GrowingRule(a_b*b_c, [seg4, spike2]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
         tree_prod.init(this.cont.gl, this.gs, this.bone);
@@ -154,8 +167,11 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     play_demo(t) {
         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        
-        this.tree_model = this.tree_prod.private_get_model(.3+((t%15)/15)*.7, Mat4.identity());
+        let period = 8;
+        let rootp = Math.sqrt(period);
+        if (t%(period) < period) {
+            this.tree_model = this.tree_prod.private_get_model(.22+(Math.sqrt(t%period)/rootp)*.78, Mat4.identity());
+        }
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
         this.tree_model.draw(this.gs, R, this.bone);
     }
