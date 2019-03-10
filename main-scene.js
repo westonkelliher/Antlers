@@ -125,26 +125,26 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-        var end = new TreeBranchEnd();
+        var end = new GrowingBranchEnd();
 
-        var seg0 = new TreeSegment(6, Math.PI*0, 0, 0, 0 ,0);
-        var seg1 = new TreeSegment(4, -Math.PI*.1, Math.PI*0, .95, -Math.PI*0.6, Math.PI*1/10);
-        var seg2 = new TreeSegment(4, Math.PI*.9, Math.PI*.2, .8, Math.PI*.7, Math.PI*1/11);
-        var seg3 = new TreeSegment(5, Math.PI*0, Math.PI*.05, .8, Math.PI*.4, Math.PI*1/9);
-        var seg4 = new TreeSegment(5, Math.PI*1.1, Math.PI*.1, .8, Math.PI*0, Math.PI*1/9);
+        var seg0 = new GrowingSegment(6, Math.PI*0, 0, 0, 0 ,0);
+        var seg1 = new GrowingSegment(4, -Math.PI*.1, Math.PI*0, .95, -Math.PI*0.6, Math.PI*1/10);
+        var seg2 = new GrowingSegment(4, Math.PI*.9, Math.PI*.2, .8, Math.PI*.7, Math.PI*1/11);
+        var seg3 = new GrowingSegment(5, Math.PI*0, Math.PI*.05, .8, Math.PI*.4, Math.PI*1/9);
+        var seg4 = new GrowingSegment(5, Math.PI*1.1, Math.PI*.1, .8, Math.PI*0, Math.PI*1/9);
 
-        var branch1 = new TreeBranch(1, Math.PI*1.2, .4);
-        var branch2 = new TreeBranch(1.5, Math.PI*.3, .95);
+        var branch1 = new GrowingBranch(1, Math.PI*1.2, .4);
+        var branch2 = new GrowingBranch(1.5, Math.PI*.3, .95);
 
-        var b_c = .5;
-        var ruleA = new TreeRule(1, [branch1, seg2, end, seg1, branch2, seg2, end, seg3]);
-        var ruleB = new TreeRule(b_c, [seg1, branch2, seg2, end, seg1])
-        var ruleC = new TreeRule(b_c*b_c, [seg1, seg0]);
+        var b_c = .6;
+        var ruleA = new GrowingRule(1, [branch1, seg2, end, seg1, branch2, seg2, end, seg3]);
+        var ruleB = new GrowingRule(b_c, [seg1, branch2, seg2, end, seg1])
+        var ruleC = new GrowingRule(b_c*b_c, [seg1, seg0]);
 
-        var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
         tree_prod.init(this.cont.gl, this.gs, this.bone);
 
-        var rule0 = new TreeRule(0, []);
+        var rule0 = new GrowingRule(0, []);
         ruleA.make_interpolable(ruleB);
         this.rule = ruleA;
     
