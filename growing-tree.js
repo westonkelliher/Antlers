@@ -83,10 +83,6 @@ class GrowingSegment extends GrowingPart {
 			       treeSeg2.end_theta-this.end_theta, treeSeg2.end_phi-this.end_phi);
     }
 
-    towards_zero_vector() {
-	return new GrowingSegment(-this.base_length, -this.base_theta, -this.base_phi, -this.end_size, -this.end_theta, -this.end_phi);
-    }
-
     copy() {
 	return new GrowingSegment(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
@@ -128,10 +124,6 @@ class GrowingBranch extends GrowingPart {
 			      //theta > 0 ? (theta < Math.PI ? theta : -Math.PI*2 + theta) : (theta > -Math.PI ? theta : Math.PI*2 + theta),
 			      treeBranch2.branch_theta - this.branch_theta,
 			      treeBranch2.size_ratio - this.size_ratio);
-    }
-
-    towards_zero_vector() {
-	return new GrowingBranch(-this.branch_point, -this.branch_theta, -this.size_ratio);
     }
 
     copy() {
@@ -180,8 +172,8 @@ class GrowingRule {
     }
     
     interpolated_copy(x) {
-	//console.log(this.right_hand);
-	console.log(this.interp_vector[1]);
+	console.log(this.right_hand);
+	console.log(this.interp_vector);
 	let rule = this.copy()
 	for (let i = 0; i < rule.right_hand.length; i++) {
 	    let k = rule.right_hand[i];
@@ -239,13 +231,13 @@ class GrowingRule {
 	let num = 0;
 	let level = 0;
 	for (; i < this.right_hand.length && level >= 0; i++) {
-	    if (level == 0 && (this.right_hand[i].symbol == 'I' || this.right_hand[i].symbol == 'v') ) {
+	    if (level == 0 && (this.right_hand[i].to_string() == 'I' || this.right_hand[i].to_string() == 'v') ) {
 		num++;
 	    }
-	    else if (this.right_hand[i].symbol == 'L(') {
+	    else if (this.right_hand[i].to_string() == 'L(') {
 		level++;
 	    }
-	    else if (this.right_hand[i].symbol == ')') {
+	    else if (this.right_hand[i].to_string() == ')') {
 		level--;
 	    }
 	}
@@ -264,94 +256,132 @@ class GrowingRule {
 	let level1 = 0;
 	let level2 = 0;
 	let n_segs1 = this.num_segs(i1);
+	//console.log('o');
 	let n_segs2 = rule2.num_segs(i2);
+	//console.log("__"+this.right_hand+ ' '+rule2);
 	let rh_vector = [];
-	while (i1 < this.right_hand.length && i2 < rule2.right_hand.length && level1 >= 0 && level2 >= 0) {//while within rh arrays and levels are >= 0
-	    if (segi1 < n_segs2-n_segs1) {
-		if (rule2.right_hand[i2].to_string() != ')') {
-		    rh_vector.push(rule2.right_hand[i2].no_length_vector());
-		    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
-		}
-		if (level2 == 0 && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v')) {
-		    segi1++;
-		}
-		else if (rule2.right_hand[i2].to_string() == 'L(') {
-		    level2++;
-		}
-		else if (rule2.right_hand[i2].to_string() == ')') {
-		    rh_vector.push(rule2.right_hand[i2]);
-		    this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
-		    level2--;
-		}	    
-		i1++;
-		i2++;
+	
+	while (segi1 < n_segs2-n_segs1) {
+	    console.log('bdhjefefhb');
+	    if (rule2.right_hand[i2].to_string() != ')') {
+		rh_vector.push(rule2.right_hand[i2].no_length_vector());
+		this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 	    }
-	    else {
+	    if (level2 == 0 && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v')) {
+		segi1++;
+	    }
+	    else if (rule2.right_hand[i2].to_string() == 'L(') {
+		level2++;
+	    }
+	    else if (rule2.right_hand[i2].to_string() == ')') {
+		rh_vector.push(rule2.right_hand[i2]);
+		this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
+		level2--;
+	    }	    
+	    i1++;
+	    i2++;
+	}
 
-		if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
-		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
-		    i1++; i2++;
+	while (segi2 < n_segs1-n_segs2) {
+	    if (this.right_hand[i1].to_string() != ')') {
+		rh_vector.push(this.right_hand[i1].towards(this.right_hand[i1].no_length_copy()));
+	    }
+	    if (level1 == 0 && (this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v')) {
+		segi2++;
+	    }
+	    else if (this.right_hand[i1].to_string() == 'L(') {
+		level1++;
+	    }
+	    else if (this.right_hand[i1].to_string() == ')') {
+		rh_vector.push(this.right_hand[i1]);
+		level1--;
+	    }	    
+	    i1++;
+	}
+
+	console.log(rh_vector);
+	while (i1 < this.right_hand.length && i2 < rule2.right_hand.length) {
+	    //console.log('bap');
+	    if (this.right_hand[i1].to_string() == ')' && rule2.right_hand[i2].to_string() == ')' && level1 == 0 && level2 == 0) {
+		//console.log('hitting both ends');
+		rh_vector.push(this.right_hand[i1]);
+		break;
+	    }
+	    if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
+		//console.log("both segs");
+		rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
+		i1++; i2++;
+		//console.log(i1+" "+i2);
 		}
-		else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'L(') {
-		    rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
-		    i1++; i2++; level1++; level2++;
-		    rh_vector = rh_vector.concat(this.private_make_interpolable(i1, rule2, i2));
-		    i1 = this.scan_to_end(i1);
-		    i2 = rule2.scan_to_end(i2);
-		}
-		else if (this.right_hand[i1].to_string() == 'L(' && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
-		    rh_vector.push(this.right_hand[i1].towards_zero_vector());
+	    else if (this.right_hand[i1].to_string() == 'L(' && rule2.right_hand[i2].to_string() == 'L(') {
+		rh_vector.push(this.right_hand[i1].towards(rule2.right_hand[i2]));
+		i1++; i2++;
+		//console.log('recurs');
+		rh_vector = rh_vector.concat(this.private_make_interpolable(i1, rule2, i2));
+		//console.log(i1 + " " + i2);
+		i1 = this.scan_to_end(i1);
+		i2 = rule2.scan_to_end(i2);
+		//console.log(i1 + " " + i2);
+	    }
+	    else if (this.right_hand[i1].to_string() == 'L(' && (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') ) {
+		rh_vector.push(this.right_hand[i1].towards(this.right_hand[i1].zero_copy()));
 		    let current_level = level1;
-		    level1++; i1++;
-		    while (level1 > current_level) {
-			if (this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') {
-			    rh_vector.push(this.right_hand[i1].towards_zero_vector());
-			}
-			if (this.right_hand[i1].to_string() == 'L(') {
-			    rh_vector.push(this.right_hand[i1].towards_zero_vector());
-			    level1++;
-			}
-			else if (this.right_hand[i1].to_string() == ')') {
-			    rh_vector.push(this.right_hand[i1]);
-			    level1--;
-			}
+		level1++; i1++;
+		while (level1 > current_level) {
+		    if (this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') {
+			rh_vector.push(this.right_hand[i1].towards(this.right_hand[i1].zero_copy()));
+		    }
+		    else if (this.right_hand[i1].to_string() == 'L(') {
+			rh_vector.push(this.right_hand[i1].towards(this.right_hand[i1].zero_copy()));
+			level1++;
+		    }
+		    else if (this.right_hand[i1].to_string() == ')') {
+			rh_vector.push(this.right_hand[i1]);
+			level1--;
+		    }
+		    i1++;
+		}
+	    }
+	    else if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && rule2.right_hand[i2].to_string() == 'L(') {
+		//console.log("1 seg  2 branch");
+		//console.log(i1+' '+i2);
+		this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
+		i1++;
+		rh_vector.push(rule2.right_hand[i2].no_length_vector());
+		let current_level = level2;
+		level2++; i2++;
+		while (level2 > current_level) {
+		    if (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') {
+			this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
 			i1++;
+			rh_vector.push(rule2.right_hand[i2].no_length_vector());
 		    }
-		}
-		else if ((this.right_hand[i1].to_string() == 'I' || this.right_hand[i1].to_string() == 'v') && rule2.right_hand[i2].to_string() == 'L(') {
-		    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
-		    i1++;
-		    rh_vector.push(rule2.right_hand[i2].no_length_vector());
-		    let current_level = level2;
-		    level2++; i2++;
-		    while (level2 > current_level) {
-			if (rule2.right_hand[i2].to_string() == 'I' || rule2.right_hand[i2].to_string() == 'v') {
-			    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
-			    i1++;
-			    rh_vector.push(rule2.right_hand[i2].no_length_vector());
-			}
-			if (rule2.right_hand[i2].to_string() == 'L(') {
-			    this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
-			    i1++;
-			    rh_vector.push(this.right_hand[i1].no_length_vector());
-			    level2++;
-			}
-			else if (rule2.right_hand[i2].to_string() == ')') {
-			    this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
-			    i1++;
-			    rh_vector.push(rule2.right_hand[i2]);
-			    level2--;
-			}
-			i2++;
+		    if (rule2.right_hand[i2].to_string() == 'L(') {
+			this.right_hand.splice(i1, 0, rule2.right_hand[i2].no_length_copy());
+			i1++;
+			rh_vector.push(this.right_hand[i2].no_length_vector());
+			level2++;
 		    }
-		}
-		else {
-		    rh_vector.push(this.right_hand[i1]);
-		    i1++;
+		    else if (rule2.right_hand[i2].to_string() == ')') {
+			this.right_hand.splice(i1, 0, rule2.right_hand[i2]);
+			i1++;
+			rh_vector.push(rule2.right_hand[i2]);
+			level2--;
+		    }
 		    i2++;
 		}
 	    }
+	    else {
+		//console.log('bad');
+		rh_vector.push(this.right_hand[i1]);
+		i1++;
+		i2++;
+	    }
+	    //console.log(this.right_hand.length+ "-");
 	}
+	//console.log('end of while');
+
+	//console.log(rh_vector);
 	this.interp_vector = rh_vector;
 	return rh_vector;
     }
@@ -359,10 +389,10 @@ class GrowingRule {
     scan_to_end(i) {
 	let level = 0;
 	while (i < this.right_hand.length) {
-	    if (this.right_hand[i] == 'L(') {
+	    if (this.right_hand[i].to_string() == 'L(') {
 		level++;
 	    }
-	    else if (this.right_hand[i] == ')') {
+	    else if (this.right_hand[i].to_string() == ')') {
 		if (level == 0) {
 		    return i+1;
 		}
