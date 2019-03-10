@@ -98,7 +98,7 @@ class TreeBranch extends TreePart {
     constructor(branch_point, branch_theta, size_ratio) {
 	super('L(');
 	this.branch_point = branch_point; //where along the parent branch the next branch starts
-	this.branch_theta = branch_theta > 0 ? branch_theta : Math.PI*2 -branch_theta;
+	this.branch_theta = branch_theta;
 	this.size_ratio = size_ratio;
     }
     
@@ -125,7 +125,8 @@ class TreeBranch extends TreePart {
     towards(treeBranch2) {
 	let theta = treeBranch2.branch_theta - this.branch_theta;
 	return new TreeBranch(treeBranch2.branch_point - this.branch_point,
-			      theta > 0 ? (theta < Math.PI ? theta : -Math.PI*2 + theta) : (theta > -Math.PI ? theta : Math.PI*2 + theta),
+			      //theta > 0 ? (theta < Math.PI ? theta : -Math.PI*2 + theta) : (theta > -Math.PI ? theta : Math.PI*2 + theta),
+			      treeBranch2.branch_theta - this.branch_theta,
 			      treeBranch2.size_ratio - this.size_ratio);
     }
 
@@ -180,7 +181,7 @@ class TreeRule {
     
     interpolated_copy(x) {
 	//console.log(this.right_hand);
-	//console.log(this.interp_vector);
+	console.log(this.interp_vector[1]);
 	let rule = this.copy()
 	for (let i = 0; i < rule.right_hand.length; i++) {
 	    let k = rule.right_hand[i];
@@ -444,9 +445,7 @@ class TreeProduction {
 		let rule_depth = 0;
 		let rule = this.rules[i];
 		if (i != 0) {
-		    console.log(size+' '+this.rules[i-1].max_size+' '+this.rules[i].max_size);
 		    rule_depth = 1 - (size-this.rules[i-1].max_size)/(this.rules[i].max_size-this.rules[i-1].max_size);
-		    console.log(rule_depth);
 		    rule = this.rules[i].interpolated_copy(rule_depth);
 		}
 		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
