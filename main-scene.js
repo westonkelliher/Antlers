@@ -1,6 +1,13 @@
 
 
-let rand = Math.floor(Math.random() * 4);
+let shoot = 0;
+let translation = 0;
+
+let ranVar = 0;
+let arrowCoordX;
+let bool = 0;
+let bullseye = 0;
+
 
 class Assignment_Two_Skeleton extends Scene_Component {
     // The scene begins by requesting the camera, shapes, and materials it will need.
@@ -13,7 +20,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         // Locate the camera here (inverted matrix).
         const r = context.width / context.height;
-        
+       
         context.globals.graphics_state.camera_transform = Mat4.translation([1,-1,-32.5]);
         context.globals.graphics_state.projection_transform = Mat4.perspective(Math.PI / 4, r, .1, 1000);
 
@@ -92,7 +99,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.lights = [new Light(Vec.of(10, 10, 20, 1), Color.of(1, .4, 1, 1), 100000)];
 
         this.t = 0;
-
         this.initialize_demo();
 
         
@@ -103,6 +109,11 @@ class Assignment_Two_Skeleton extends Scene_Component {
     make_control_panel() {
         this.key_triggered_button("Pause Time", ["n"], () => {
             this.paused = !this.paused;
+        });
+        this.key_triggered_button("Shoot Arrow", ["t"], () => {
+           shoot = !shoot;
+           bool = !bool;
+           bullseye = 0;
         });
     }
 
@@ -149,8 +160,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
     }
 
     generateRocks(num){
-
-
         var T; var R; var S; var M;
 
         M = Mat4.identity();
@@ -253,6 +262,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
         S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
         R = Mat4.rotation(-Math.PI /4 + (0.3 * Math.sin(t)) , Vec.of(1,0,0));
 
+        if(bullseye){
+          R = Mat4.rotation(Math.PI + (0.3 * Math.sin(t)) , Vec.of(1,0,0));  
+        }
+
         Arms = Arms.times(T).times(R).times(T1).times(S);
         this.shapes['box'].draw(this.gs, Arms,this.plastic);
 
@@ -262,6 +275,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
         T1 = Mat4.translation(Vec.of(0 + (bodyRadius/2),0 - (torsoHeight), - (bodyRadius/2)));
         S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
         R = Mat4.rotation(-Math.PI /4 + (-0.3 * Math.sin(t)) , Vec.of(1,0,0));
+
+        if(bullseye){
+          R = Mat4.rotation(Math.PI - (0.3 * Math.sin(t)) , Vec.of(1,0,0));  
+        }
 
         Arms = Arms.times(T).times(R).times(T1).times(S);
         this.shapes['box'].draw(this.gs, Arms,this.plastic);
@@ -279,8 +296,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         Head = Head.times(T).times(R1).times(T1).times(R2).times(R).times(S);
         this.shapes['box'].draw(this.gs, Head,this.shape_materials['head']);
-    
-
 
     }
     
@@ -316,9 +331,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
-
-
-
         this.tree_prod = tree_prod;
         this.tree_model = tree_prod.get_model();
         this.tree_model.copy_onto_graphics_card(this.cont.gl);
@@ -332,6 +344,76 @@ class Assignment_Two_Skeleton extends Scene_Component {
         //3 - define production tree from those rules (and define threshholds)
 
         //4 - generate model from production tree
+    }
+
+    createShootArrow(arrow_speed){
+        var Arrow; let T; let T1; let S; let R;
+    
+        Arrow = Mat4.identity();
+        let starting_distance = 30;
+        let arrow_head_length = .05;
+        let arrow_length = arrow_head_length * 250;
+        let arrow_body_radius = 1;
+
+        if(!bool){
+            arrowCoordX = Math.PI/4 * Math.cos(this.t);
+        }
+            
+        if(shoot){
+
+            translation += (this.gs.animation_delta_time / 1000) * arrow_speed; 
+            if (translation < starting_distance - arrow_body_radius){
+                T = Mat4.translation(Vec.of(0,0,-translation));
+                Arrow = Arrow.times(T);
+            }
+
+        }else{
+            
+            translation = 0;
+        }
+
+
+        if (translation >= starting_distance - arrow_body_radius){
+                 T = Mat4.translation(Vec.of(arrowCoordX,0,-starting_distance + arrow_body_radius));
+                 Arrow = Arrow.times(T);
+                 if(arrowCoordX < 0.1 && arrowCoordX > -0.1){
+                     bullseye = 1;
+                 }
+        }
+        else{
+            T = Mat4.translation(Vec.of(arrowCoordX,0,0));
+            Arrow = Arrow.times(T);
+        }
+
+        T = Mat4.translation(Vec.of(0,1,starting_distance));
+        S = Mat4.scale(Vec.of(arrow_head_length,arrow_head_length,arrow_head_length));
+        R = Mat4.rotation(Math.PI, Vec.of(0,1,0));
+
+        Arrow = Arrow.times(T).times(S).times(R);
+        this.shapes['Arrowhead'].draw(this.gs, Arrow,this.antlers);
+
+        
+        T = Mat4.translation(Vec.of(0,0,-arrow_length));
+        S = Mat4.scale(Vec.of(arrow_body_radius,arrow_body_radius,arrow_length));
+        Arrow = Arrow.times(T).times(S);
+        this.shapes['cylinder'].draw(this.gs, Arrow,this.antlers);
+
+        Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,-arrow_length/12.5)));
+        this.shapes['circle'].draw(this.gs, Arrow,this.antlers);
+
+        Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,arrow_length/12.5)));
+
+        R = Mat4.rotation(Math.PI/4, Vec.of(0,0,1));
+        S = Mat4.scale(Vec.of(.2,1,0.2));
+        T = Mat4.translation(Vec.of(0, arrow_body_radius * 2, -1));
+        Arrow = Arrow.times(R).times(T).times(S);
+        this.shapes['box'].draw(this.gs, Arrow,this.bone);
+
+        T = Mat4.translation(Vec.of(0, arrow_body_radius * -4, 0));
+        Arrow = Arrow.times(T);
+        this.shapes['box'].draw(this.gs, Arrow,this.bone);
+
+
     }
 
     play_demo() {
@@ -381,59 +463,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
 //              this.gs.camera_transform = M1.times(T1);//.times(T2);
 
         this.createPerson(4.6,0.2,1.2,t);
-        var Arrow; let T; let T1; let S; let R;
-    
-         Arrow = Mat4.identity();
-         let starting_distance = 30;
-         let arrow_head_length = .05;
-        let arrow_length = arrow_head_length * 250;
-        let arrow_body_radius = 1;
-
-        //if(t > 3){
-
-        var translation = t;
-            
-            if(t < 8){
-                T = Mat4.translation(Vec.of(0,0, -translation * 10));
-            }
-        //}
-        if (t > 8){
-             T = Mat4.translation(Vec.of(0,0,-starting_distance + arrow_body_radius ));
-        }
-        Arrow = Arrow.times(T);
-
-
         
-       
-        T = Mat4.translation(Vec.of(0,1,starting_distance));
-        S = Mat4.scale(Vec.of(arrow_head_length,arrow_head_length,arrow_head_length));
-        R = Mat4.rotation(Math.PI, Vec.of(0,1,0));
+        //Arrow Speed Parameter
+        this.createShootArrow(30);
 
-        Arrow = Arrow.times(T).times(S).times(R);
-        this.shapes['Arrowhead'].draw(this.gs, Arrow,this.antlers);
-
-        
-        T = Mat4.translation(Vec.of(0,0,-arrow_length));
-        S = Mat4.scale(Vec.of(arrow_body_radius,arrow_body_radius,arrow_length));
-        Arrow = Arrow.times(T).times(S);
-        this.shapes['cylinder'].draw(this.gs, Arrow,this.antlers);
-
-        Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,-arrow_length/12.5)));
-        this.shapes['circle'].draw(this.gs, Arrow,this.antlers);
-
-                Arrow = Arrow.times(Mat4.translation(Vec.of(0,0,arrow_length/12.5)));
-
-        R = Mat4.rotation(Math.PI/4, Vec.of(0,0,1));
-        S = Mat4.scale(Vec.of(.2,1,0.2));
-        T = Mat4.translation(Vec.of(0, arrow_body_radius * 2, -1));
-        Arrow = Arrow.times(R).times(T).times(S);
-        this.shapes['box'].draw(this.gs, Arrow,this.bone);
-
-        T = Mat4.translation(Vec.of(0, arrow_body_radius * -4, 0));
-        Arrow = Arrow.times(T);
-        this.shapes['box'].draw(this.gs, Arrow,this.bone);
-        
-        
 
         this.play_demo();
 
