@@ -1,5 +1,5 @@
 # Antlers
-project by Weston Kelliher, Pierson Marks, and David West
+Project by Weston Kelliher, Pierson Marks (3047424143), and David West
 
 ### Goal
 
@@ -16,3 +16,19 @@ The antlers will be attached to an animal’s body, where the animal is placed i
 ### Challenges
 One of the biggest challenges that we believe we will face is the smooth transition between antlers. This challenge appears due to the combination of an L-system and feature vector to coordinate a smooth transition between models. We want to prevent sudden changes of angles or entire sections disappearing arbitrarily. In addition, another challenge will be the real-time rendering and texturing of the antlers while using a camera to track this growth. If in a time crunch, this real-time growth and rendering may be done before the start of the video and the world will not be as vividly developed. Another challenge will be to do the bulk of calculations on the morphology of the antlers directly on the graphics card. Because we have to modify specific vertices of shapes, we cannot simply load in our shapes then use affine transform to move them around.
 
+### Overview
+   
+   This project aims to be a simple and intuitive game using the WebGL platform. Currently, the world consists of a large grassy field, scattered with rocks and a tree in the center. You are a prospective archer, however, you have no formal archery experience. Your neighbor Steve, has found you shooting at a large willow tree in the field and offered to help teach you. Steve hangs a target to the tree and sits on a nearby boulder, watching as you improve your archery technique. If you hit the bullseye (or close enough), Steve throws his hands up and rejoices. 
+
+Additionally, if you are an extremely poor archer with horrible aim and hit the tree, an apple falls and strikes Steve on the head. Poor Steve!   
+
+### Texture Sources
+
+Person Head (head.jpg):
+       https://i.imgur.com/i9kLU.jpg (March 6th, 2019)
+Person Torso (body.png):
+       https://i.imgur.com/i9kLU.jpg (March 6th, 2019)
+Target:
+       Created by Pierson Marks using Adobe Illustrator
+Grass: 
+       https://www.textures.com/system/gallery/photos/Nature/Grass/37751/Grass0073_1_270.jpg (March 6th, 2019)
