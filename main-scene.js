@@ -14,7 +14,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         // Locate the camera here (inverted matrix).
         const r = context.width / context.height;
         
-        context.globals.graphics_state.camera_transform = Mat4.translation([0,0,-35]);
+        context.globals.graphics_state.camera_transform = Mat4.translation([0,-1,-35]);
         context.globals.graphics_state.projection_transform = Mat4.perspective(Math.PI / 4, r, .1, 1000);
 
         // At the beginning of our program, load one of each of these shape
@@ -26,25 +26,26 @@ class Assignment_Two_Skeleton extends Scene_Component {
         // same thing here.
         const shapes = {
             'square': new Square(),
-            'circle': new Circle(15),
+            'circle': new Circle(20),
             'pyramid': new Tetrahedron(false),
             'simplebox': new SimpleCube(),
             'box': new Cube(),
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
             'ball': new Subdivision_Sphere(4),
-            'rock': new Rock(1)
+            'rock': new Rock(1),
+            'Arrowhead': new Arrowhead(20)
 
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
 
         // Make some Material objects available to you:
-        this.clay = context.get_instance(Phong_Shader).material(Color.of(.9, .5, .9, 1), {
+        this.clay = context.get_instance(Phong_Shader).material(Color.of(.075, .59, .58, 1), {
             ambient: .4,
             diffusivity: .4
         });
-        this.oranges = context.get_instance(Phong_Shader).material(Color.of(.5, .5, .5, 1), {
+        this.oranges = context.get_instance(Phong_Shader).material(Color.of(.145, .117, .401, 1), {
             ambient: .4,
             diffusivity: .4
         });
@@ -77,7 +78,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
             pyramid: "assets/tetrahedron-texture2.png",
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
-            circle: "assets/hypnosis.jpg",
+            circle: "assets/target.png",
             head: "assets/head.jpg",
             body: "assets/body.png",
             arms: "assets/arms.png"
@@ -159,7 +160,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
                 R = Mat4.rotation(Math.PI/3, Vec.of(0,1,0));
                 T = Mat4.translation(Vec.of(i,0,i));
             }
-            T = Mat4.translation(Vec.of(i,0,i));
+            T = Mat4.translation(Vec.of(i * 1.4,0,i));
             M = M.times(R).times(T);
             this.shapes['rock'].draw(this.gs, M,this.bone);            
         }
@@ -182,38 +183,54 @@ class Assignment_Two_Skeleton extends Scene_Component {
             }
         }
 
+        //Create Target
+        let target_size = .5;
+        var Target = Mat4.identity();
 
-       this.generateRocks(world_size * 2);
+        S = Mat4.scale(Vec.of(target_size,target_size,target_size));   
+        T = Mat4.translation(Vec.of(0,1,1));
+
+        Target = Target.times(T).times(S);
+        this.shapes['circle'].draw(this.gs, Target,this.shape_materials['circle']);
+
+       this.generateRocks(world_size * 1.5);
         
 
     }
 
     createPerson(x,y,z,t){
-        var T; var R; var S; var Body;
+        var T; var T1; var R; var R1; var S; var Body;
 
-        let torsoHeight = .6;
-        let legHeight = .6;
+        let body_proportion = 0.4;
+
+        let torsoHeight = body_proportion;
+        let legHeight = body_proportion;
         let bodyHeight = legHeight + torsoHeight;
 
-        let headRadius = .5;
-        let bodyRadius = .5;
+        let headRadius = body_proportion;
+        let bodyRadius = body_proportion;
 
 
         //Legs
         var Legs;
         Legs = Mat4.identity();
-        T = Mat4.translation(Vec.of(x - bodyRadius/2,y + torsoHeight,z));
+        T = Mat4.translation(Vec.of(x - bodyRadius,y + (torsoHeight * 2),z + (bodyRadius/2)));
+
+        T1 = Mat4.translation(Vec.of(0 + (bodyRadius/2),0 - (torsoHeight), - (bodyRadius/2)));
         S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
-        R = Mat4.rotation(Math.sin(t), Vec.of(1,0,0));
-        Legs = Legs.times(T).times(R).times(S);
+        R = Mat4.rotation(-Math.PI /4 + (0.1 * Math.sin(t)) , Vec.of(1,0,0));
+
+        Legs = Legs.times(T).times(R).times(T1).times(S);//.times(R).times(S);//.times(T1).times(S);
         this.shapes['box'].draw(this.gs, Legs,this.oranges);
 
         Legs = Mat4.identity();
-        T = Mat4.translation(Vec.of(x + bodyRadius/2,y + torsoHeight,z));
-        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
-        R = Mat4.rotation(Math.sin(-t), Vec.of(1,0,0));
+        T = Mat4.translation(Vec.of(x + bodyRadius,y + (torsoHeight * 2),z + (bodyRadius/2)));
+        T1 = Mat4.translation(Vec.of(0 - (bodyRadius/2),0 - (torsoHeight), - (bodyRadius/2)));
 
-        Legs = Legs.times(T).times(R).times(S);
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(-1 * Math.PI/4 - (0.1 * Math.sin(t)), Vec.of(1,0,0));
+
+        Legs = Legs.times(T).times(R).times(T1).times(S);
         this.shapes['box'].draw(this.gs, Legs,this.oranges);
 
 
@@ -230,28 +247,37 @@ class Assignment_Two_Skeleton extends Scene_Component {
         //Arms
         var Arms;
         Arms = Mat4.identity();
-        T = Mat4.translation(Vec.of(x + bodyRadius + bodyRadius/2,y + torsoHeight + legHeight * 2,z));
-        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
-        R = Mat4.rotation(Math.sin(t), Vec.of(1,0,0));
+        T = Mat4.translation(Vec.of(x + bodyRadius,y + (torsoHeight * 4),z + (bodyRadius/2)));
 
-        Arms = Arms.times(T).times(R).times(S);
+        T1 = Mat4.translation(Vec.of(0 + (bodyRadius/2),0 - (torsoHeight), - (bodyRadius/2)));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(-Math.PI /4 + (0.3 * Math.sin(t)) , Vec.of(1,0,0));
+
+        Arms = Arms.times(T).times(R).times(T1).times(S);
         this.shapes['box'].draw(this.gs, Arms,this.plastic);
 
-        Arms = Mat4.identity();
-        T = Mat4.translation(Vec.of(x - (bodyRadius + bodyRadius/2),y + torsoHeight + legHeight * 2,z));
+       Arms = Mat4.identity();
+        T = Mat4.translation(Vec.of(x - bodyRadius*2,y + (torsoHeight * 4),z + (bodyRadius/2)));
+
+        T1 = Mat4.translation(Vec.of(0 + (bodyRadius/2),0 - (torsoHeight), - (bodyRadius/2)));
         S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
-        R = Mat4.rotation(Math.sin(-t), Vec.of(1,0,0));
-        Arms = Arms.times(T).times(R).times(S);
+        R = Mat4.rotation(-Math.PI /4 + (-0.3 * Math.sin(t)) , Vec.of(1,0,0));
+
+        Arms = Arms.times(T).times(R).times(T1).times(S);
         this.shapes['box'].draw(this.gs, Arms,this.plastic);
 
 
         //Head
-        var Head;
+        var Head; let R2;
         Head = Mat4.identity();
         S = Mat4.scale(Vec.of(headRadius,headRadius,headRadius - .1));
         R = Mat4.rotation(Math.PI/2, Vec.of(0,0,1));
-        T = Mat4.translation(Vec.of(x,y + torsoHeight * 2 + legHeight * 2 + headRadius,z));
-        Head = Head.times(T).times(S).times(R);
+        R2 = Mat4.rotation(Math.PI/20, Vec.of(1,0,0));
+        R1 = Mat4.rotation(Math.PI/2 * -.1 * Math.cos(t), Vec.of(1,0,0));
+        T = Mat4.translation(Vec.of(x,y + (torsoHeight* 3) + (legHeight * 2) - headRadius + 0.03,z + headRadius/2));
+        T1 = Mat4.translation(Vec.of(0,0 - (- headRadius), - headRadius/2));
+
+        Head = Head.times(T).times(R1).times(T1).times(R2).times(R).times(S);
         this.shapes['box'].draw(this.gs, Head,this.shape_materials['head']);
     
 
@@ -338,8 +364,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //first parameter : size of world
         //second parameter : size of individual planes
-        let world_size = 4;
-        let sizeOfPlane = 3;
+        let world_size = 8;
+        let sizeOfPlane = 4;
 
         this.intialize_world(world_size, sizeOfPlane);  
         
@@ -347,14 +373,36 @@ class Assignment_Two_Skeleton extends Scene_Component {
 //         let camera_radius = 10;
         
 //         let R1 = Mat4.rotation(t * Math.PI/6, Vec.of(0,1,0));
-//         let T1 = Mat4.translation(Vec.of(camera_radius * Math.cos(t),0,camera_radius * Math.sin(t)));
+//         let T1 = Mat4.translation(Vec.of(0,1,0));
 //         let M1 = Mat4.identity();
 
 //         //Allow camera movement if paused.
 //         if (!this.paused)
-//              this.gs.camera_transform = M1.times(R1).times(T1);//.times(T2);
+//              this.gs.camera_transform = M1.times(T1);//.times(T2);
 
-        this.createPerson(6,0,Math.sin(t) * 2,t);
+        this.createPerson(4.6,0.2,1.2,t);
+        var Arrow; let T; let S; let R;
+
+        let arrow_head_length = .05;
+        Arrow = Mat4.identity();
+        T = Mat4.translation(Vec.of(0,1,30));
+        S = Mat4.scale(Vec.of(arrow_head_length,arrow_head_length,arrow_head_length));
+        R = Mat4.rotation(Math.PI, Vec.of(0,1,0));
+
+        Arrow = Arrow.times(T).times(S).times(R);
+        this.shapes['Arrowhead'].draw(this.gs, Arrow,this.bone);
+
+        let arrow_length = arrow_head_length * 250;
+        let arrow_body_radius = 1;
+        T = Mat4.translation(Vec.of(0,0,-arrow_length));
+        S = Mat4.scale(Vec.of(arrow_body_radius,arrow_body_radius,arrow_length));
+        Arrow = Arrow.times(T).times(S);
+        this.shapes['cylinder'].draw(this.gs, Arrow,this.bone);
+
+
+        
+        
+
         this.play_demo();
 
 

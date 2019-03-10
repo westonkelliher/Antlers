@@ -98,6 +98,31 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
     }
 }
 
+window.Arrowhead = window.classes.Arrowhead = class Arrowhead extends Shape {
+     constructor(sections) {
+        super("positions", "normals", "texture_coords");
+     
+        this.positions.push(...Vec.cast([1, 0, 0]));
+        this.normals.push(...Vec.cast(  [0, 0, 1]));
+        this.texture_coords.push(...Vec.cast([1, 0.5]));
+
+        let t = Vec.of(0, 0, 4);
+        for (let i = 0; i < sections; ++i) {
+            const angle = 2 * Math.PI * (i + 1) / sections,
+                v = Vec.of(Math.cos(angle), Math.sin(angle), 0),
+                id = 2 * i + 1;
+
+            this.positions.push(...Vec.cast(t, v));
+            this.normals.push(...Vec.cast(
+                v.mix(this.positions[id - 1], 0.5).plus(t).normalized(),
+                v.plus(t).normalized()));
+            this.texture_coords.push(...Vec.cast([0.5, 0.5], [(v[0] + 1) / 2, (v[1] + 1) / 2]));
+            this.indices.push(
+                id - 1, id, id + 1);
+        }
+     
+     }
+}
 
 window.Square = window.classes.Square = class Square extends Shape {
     constructor() {
