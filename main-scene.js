@@ -65,7 +65,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.g_leaf = context.get_instance(Phong_Shader).material(Color.of(0, 1, .2, 1),{
             ambient: 0.2,
             diffusivity: 0.3,
-            specularity: 0.1
+            specularity: 0
         });
 
         // Load some textures for the demo shapes
@@ -142,17 +142,17 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-
-           this.apple = new Apple(5);
+            //apple is just a sphere, couldn't find a way to get smooth shading with an altered shape
+           this.apple = new Apple(4);
            this.apple.copy_onto_graphics_card(this.cont.gl);
 
         
-           //left, side = 1
-            this.Leaf1 = new Leaf(1,2);
-            this.Leaf1.copy_onto_graphics_card(this.cont.gl);
-            //right, side = -1
-            this.Leaf2 = new Leaf(-1,2);
-            this.Leaf2.copy_onto_graphics_card(this.cont.gl);
+           //left, side = 1, set size at 2
+            this.LeafL = new Leaf(1,2);
+            this.LeafL.copy_onto_graphics_card(this.cont.gl);
+            //right, side = -1, set size at 2
+            this.LeafR = new Leaf(-1,2);
+            this.LeafR.copy_onto_graphics_card(this.cont.gl);
 
 
 //         var end = new TreeBranchEnd();
@@ -234,17 +234,23 @@ class Assignment_Two_Skeleton extends Scene_Component {
         let a = Mat4.translation(Vec.of(0,1,0)).times(Mat4.identity());
         let b = a.times(Mat4.rotation(Math.PI/6,Vec.of(0,0,1)));
         let c = a.times(Mat4.rotation(-Math.PI/6,Vec.of(0,0,1)));
+        let d = b.times(Mat4.rotation(Math.PI/12,Vec.of(0,0,1)));
+        let e = c.times(Mat4.rotation(-Math.PI/12,Vec.of(0,0,1)));
 
         //draw axes
         this.draw_axes(12);
         this.play_demo();
-        this.shapes.ball.draw(this.gs, Mat4.identity(), this.redapp);
-        this.Leaf1.draw(this.gs, a, this.g_leaf);
-        this.Leaf2.draw(this.gs, a, this.g_leaf);
-        this.Leaf1.draw(this.gs, b, this.g_leaf);
-        this.Leaf2.draw(this.gs, b, this.g_leaf);
-        this.Leaf1.draw(this.gs, c, this.g_leaf);
-        this.Leaf2.draw(this.gs, c, this.g_leaf);
+        this.apple.draw(this.gs, Mat4.identity(), this.redapp);
+        this.LeafL.draw(this.gs, a, this.g_leaf);
+        this.LeafR.draw(this.gs, a, this.g_leaf);
+        this.LeafL.draw(this.gs, b, this.g_leaf);
+        this.LeafR.draw(this.gs, b, this.g_leaf);
+        this.LeafL.draw(this.gs, c, this.g_leaf);
+        this.LeafR.draw(this.gs, c, this.g_leaf);
+        this.LeafL.draw(this.gs, d, this.g_leaf);
+        this.LeafR.draw(this.gs, d, this.g_leaf);
+        this.LeafL.draw(this.gs, e, this.g_leaf);
+        this.LeafR.draw(this.gs, e, this.g_leaf);
 
         /*
         // Draw some demo textured shapes
