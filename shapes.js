@@ -52,7 +52,6 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
         
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, n+1);
-<<<<<<< HEAD
         }
 
     }
@@ -178,8 +177,6 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
 
         for (let i = 3*n; i < 6*n; i++){
            this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
-=======
->>>>>>> parent of 736ed45... Added leaf, apple to come
         }
 
     }

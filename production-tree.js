@@ -59,7 +59,6 @@ class TreeSegment extends TreePart {
 	return new this.model_type(this.base_length, this.base_theta, this.base_phi, this.end_size, this.end_theta, this.end_phi);
     }
 
-<<<<<<< HEAD
     get_interp_model(seg_vec, x) {
 	return new this.model_type(this.base_length+seg_vec.base_length*x, this.base_theta+seg_vec.base_theta*x,
 				   this.base_phi+seg_vec.base_phi*x, this.end_size+seg_vec.end_size*x,
@@ -94,8 +93,6 @@ class TreeSegment extends TreePart {
     
 }
 
-=======
->>>>>>> parent of 736ed45... Added leaf, apple to come
 //Tree Branch - allows the next segment to come out at an angle form somewhere in the middle of the last segment
 class TreeBranch extends TreePart {
     constructor(branch_point, branch_theta, size_ratio) {
