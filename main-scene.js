@@ -125,39 +125,47 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-        var end = new TreeBranchEnd();
 
-        var spike0 = new TreeSegment(6, Math.PI*0, -Math.PI*1/8);
+           //left, side = 1
+            this.Leaf1 = new Leaf(1,10);
+            this.Leaf1.copy_onto_graphics_card(this.cont.gl);
+            //right, side = -1
+            this.Leaf2 = new Leaf(-1,10);
+            this.Leaf2.copy_onto_graphics_card(this.cont.gl);
 
-        var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
-        var segA2 = new TreeSegment(2, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
-        //openA2                                                                                                                                                                 
-        //endA2                                                                                                                                                                  
-        var segA3 = new TreeSegment(2, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
-        //openA3                                                                                                                                                                 
 
-        var branchB1 = new TreeBranch(-.2, Math.PI*0, .69);
-        var branchB2 = new TreeBranch(-.2, Math.PI*2/5, .7);
-        var branchB3 = new TreeBranch(-.2, Math.PI*4/5, .71);
-        var branchB4 = new TreeBranch(-.2, Math.PI*6/5, .73);
-        var branchB5 = new TreeBranch(-.2, Math.PI*8/5, .72);
+//         var end = new TreeBranchEnd();
 
-        var segC1 = new TreeSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
-        var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
+//         var spike0 = new TreeSegment(6, Math.PI*0, -Math.PI*1/8);
 
+//         var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
+//         var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
+//         var segA2 = new TreeSegment(2, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
+//         //openA2                                                                                                                                                                 
+//         //endA2                                                                                                                                                                  
+//         var segA3 = new TreeSegment(2, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
+//         //openA3                                                                                                                                                                 
+
+//         var branchB1 = new TreeBranch(-.2, Math.PI*0, .69);
+//         var branchB2 = new TreeBranch(-.2, Math.PI*2/5, .7);
+//         var branchB3 = new TreeBranch(-.2, Math.PI*4/5, .71);
+//         var branchB4 = new TreeBranch(-.2, Math.PI*6/5, .73);
+//         var branchB5 = new TreeBranch(-.2, Math.PI*8/5, .72);
+
+//         var segC1 = new TreeSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
+//         var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
       
-        var b_c = .45;
-        var ruleA = new TreeProductionRule(20, [branchA2, segA2, end, segA1, segA3]);
-        var ruleB = new TreeProductionRule(b_c*0.2, [branchB1, end, branchB2, end,
-                                            branchB3, end, branchB4, end, branchB5, end])
-        var ruleC = new TreeProductionRule(b_c*.8, [segC1, segC2, spike0]);
+//         var b_c = .45;
+//         var ruleA = new TreeProductionRule(20, [branchA2, segA2, end, segA1, segA3]);
+//         var ruleB = new TreeProductionRule(b_c*0.2, [branchB1, end, branchB2, end,
+//                                             branchB3, end, branchB4, end, branchB5, end])
+//         var ruleC = new TreeProductionRule(b_c*.8, [segC1, segC2, spike0]);
 
-        var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
+//         var tree_prod = new TreeProduction([ruleC, ruleB, ruleA]);
 
-        this.tree_prod = tree_prod;
-        this.tree_model = tree_prod.get_model();
-        this.tree_model.copy_onto_graphics_card(this.cont.gl);
+//         this.tree_prod = tree_prod;
+//         this.tree_model = tree_prod.get_model();
+//         this.tree_model.copy_onto_graphics_card(this.cont.gl);
 
 
         //get model 2
@@ -179,12 +187,14 @@ class Assignment_Two_Skeleton extends Scene_Component {
     }
 
     play_demo() {
-        var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        this.tree_model.draw(this.gs, R, this.bone);
+
         
-        var T = Mat4.translation(Vec.of(10, 10, 0));
-        this.tree_prod.init(this.cont.gl, this.gs, this.bone);
-        this.tree_prod.draw_tree(1, T.times(R));
+//         var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
+//         this.tree_model.draw(this.gs, R, this.bone);
+        
+//         var T = Mat4.translation(Vec.of(10, 10, 0));
+//         this.tree_prod.init(this.cont.gl, this.gs, this.bone);
+//         this.tree_prod.draw_tree(1, T.times(R));
         
     }
 
@@ -202,6 +212,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
         //draw axes
         this.draw_axes(12);
         this.play_demo();
+        this.Leaf1.draw(this.gs, Mat4.identity(), this.bone);
+        this.Leaf2.draw(this.gs, Mat4.identity(), this.bone);
 
         /*
         // Draw some demo textured shapes

@@ -13,7 +13,7 @@ class TreeSegment extends TreePart {
     constructor(base_length, base_theta, base_phi, end_size, end_theta, end_phi) {
 	if (end_size == undefined || end_size == 0) { //spike
 	    super('v');
-	    this.model_type = Leaf;
+	    this.model_type = Apple;
 	}
 // 	else if(end_size == 1 && (end_theta = 0 || end_theta == undefined)){
 // 		super('v');
