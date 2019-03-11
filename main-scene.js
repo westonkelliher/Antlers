@@ -144,6 +144,15 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.cont_tree_6.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.cont_tree_7.copy_onto_graphics_card(this.cont.gl);
 
+	
+        this.saved_trees.big_cont_tree_1.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_2.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_3.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_4.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_5.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_6.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_7.copy_onto_graphics_card(this.cont.gl);
+
     }
 
     play_demo(t) {
@@ -165,8 +174,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
         m = m.times(T);
         this.saved_trees.spike_tree_7.draw(this.gs, m, this.bone);
 
-        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
-        m = m.times(Mat4.translation(Vec.of(0, 50, 0)));
+        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.5, .5, .5));
+        m = m.times(Mat4.translation(Vec.of(0, 30, 0)));
+        T = Mat4.translation(Vec.of(25, 0, 0));
+        
         this.saved_trees.cont_tree_1.draw(this.gs, m, this.bone);
         m = m.times(T);
         this.saved_trees.cont_tree_2.draw(this.gs, m, this.bone);
@@ -180,6 +191,24 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.cont_tree_6.draw(this.gs, m, this.bone);
         m = m.times(T);
         this.saved_trees.cont_tree_7.draw(this.gs, m, this.bone);
+
+        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
+        m = m.times(Mat4.translation(Vec.of(0, 100, 0)));
+        T = Mat4.translation(Vec.of(50, 0, 0));
+        
+        this.saved_trees.big_cont_tree_1.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_2.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_3.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_4.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_5.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_6.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.big_cont_tree_7.draw(this.gs, m, this.bone);
     }
 
 
