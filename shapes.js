@@ -70,16 +70,12 @@ window.Apple = window.classes.Apple = class Apple extends Shape{
         this.positions.push([0, 0, 0]);
         this.normals.push([0, 0, -1]);
         for (let j = 0; j < p; j++){
-            if (j < p*2/3){
-                peel = peel +0.1;
-             }
-             else{
-             peel = peel -0.1;
-             }
-            for(let i = 0; i < n; i++){
-            this.positions.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j/10, 1)).to3());
-            this.normals.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j/10)).to3());
+            
         }
+
+
+        this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
+        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
 
         for (let k = 0; k < p*n; k++){
             this.indices.push(k+1, k == p*n-1 ? 1 : k+2, p*n+1);
@@ -90,7 +86,7 @@ window.Apple = window.classes.Apple = class Apple extends Shape{
         
     }
 
-}
+
 
 window.Leaf = window.classes.Leaf = class Leaf extends Shape {
     constructor(side, size){
@@ -106,7 +102,7 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
     }
 
      this.positions.push([0, 0, 0]);
-     this.normals.push([0, 0, -side*1]);
+     this.normals.push([0, 0, -side]);
      
 
     for (let i = 0; i < n; i++){
