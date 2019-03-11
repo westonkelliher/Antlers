@@ -125,45 +125,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-        var end = new GrowingBranchEnd();
 
-        var seg0 = new GrowingSegment(0, 0, 0, 1, 0 ,0);
-        var branch0 = new GrowingBranch(0, 0, 0);
-        var spike1 = new GrowingSegment(4, 0, 0, 0, 0, 0);
-        var spike2 = new GrowingSegment(7, 0, 0, 0, 0, 0);
-
-        var seg1 = new GrowingSegment(4, Math.PI*0, Math.PI*-.15, .87, -Math.PI*0, Math.PI*0);
-        var seg2 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, -Math.PI*0);
-        var seg3 = new GrowingSegment(4, -Math.PI*.7, Math.PI*.05, .87, Math.PI*0, Math.PI*0);
-        var seg4 = new GrowingSegment(6, Math.PI*0, -Math.PI*.05, .5, Math.PI*0, Math.PI*0);
-        var seg5 = new GrowingSegment(6, Math.PI*0, -Math.PI*.05, .5, Math.PI*0, Math.PI*.05);
-        var seg6 = new GrowingSegment(6, Math.PI*0, -Math.PI*.15, .87, Math.PI*0, Math.PI*.05);
-        var seg7 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .87, Math.PI*0, Math.PI*0);
-        var seg8 = new GrowingSegment(6, Math.PI*0, -Math.PI*.1, .87, Math.PI*0, Math.PI*0);
-        var seg9 = new GrowingSegment(6, Math.PI*0, -Math.PI*.15, .87, Math.PI*0, Math.PI*0);
-
-        var branch1 = new GrowingBranch(2, Math.PI*.9, .75);
-        var branch2 = new GrowingBranch(2, -Math.PI*1, .75);
-        var branch3 = new GrowingBranch(2, Math.PI*0, .5);
-        var branch4 = new GrowingBranch(2, -Math.PI*2/3, .5);
-        var branch5 = new GrowingBranch(2, -Math.PI*4/3, .5);
-
-        var a_b = .5;
-        var b_c = .4;
-        var ruleA = new GrowingRule(1, [branch1, seg1, end, seg2, branch3, end, seg3]);
-        var ruleB = new GrowingRule(a_b, [branch1, seg1, end, seg2, seg3])
-        var ruleC = new GrowingRule(a_b*b_c, [seg4, spike2]);
-
-        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
-        tree_prod.init(this.cont.gl, this.gs, this.bone);
-
-        var rule0 = new GrowingRule(0, []);
-        ruleA.make_interpolable(ruleB);
-        this.rule = ruleA;
-    
-        this.tree_prod = tree_prod;
-
-        this.saved_trees = new SavedTrees();
+        this.saved_trees = new SavedTrees(this.cont.gl, this.gs );
 
         this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
@@ -172,6 +135,14 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.spike_tree_5.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_6.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_7.copy_onto_graphics_card(this.cont.gl);
+
+        this.saved_trees.cont_tree_1.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_2.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_3.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_4.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_5.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_6.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.cont_tree_7.copy_onto_graphics_card(this.cont.gl);
 
     }
 
@@ -193,7 +164,22 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.spike_tree_6.draw(this.gs, m, this.bone);
         m = m.times(T);
         this.saved_trees.spike_tree_7.draw(this.gs, m, this.bone);
+
+        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
+        m = m.times(Mat4.translation(Vec.of(0, 50, 0)));
+        this.saved_trees.cont_tree_1.draw(this.gs, m, this.bone);
         m = m.times(T);
+        this.saved_trees.cont_tree_2.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.cont_tree_3.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.cont_tree_4.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.cont_tree_5.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.cont_tree_6.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.cont_tree_7.draw(this.gs, m, this.bone);
     }
 
 
