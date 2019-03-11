@@ -193,7 +193,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.cont_tree_7.draw(this.gs, m, this.bone);
 
         m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
-        m = m.times(Mat4.translation(Vec.of(0, 100, 0)));
+        m = m.times(Mat4.translation(Vec.of(0, 120, 0)));
         T = Mat4.translation(Vec.of(50, 0, 0));
         
         this.saved_trees.big_cont_tree_1.draw(this.gs, m, this.bone);
