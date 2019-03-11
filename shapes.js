@@ -29,7 +29,7 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
     constructor(base_length, base_theta, base_phi) {
         super("positions", "normals");
         
-        let n = 16;
+        var n = 16;
         var remainder = base_theta%(Math.PI*2/n);
         var m = Mat4.rotation(base_theta - remainder, Vec.of(0, 0, 1));
 
@@ -52,56 +52,22 @@ window.Spike = window.classes.Spike = class Spike extends Shape {
         
         for (let i = 0; i < n; i++) {
             this.indices.push(i+1, i == n-1 ? 1 : i+2, n+1);
+            
         }
 
     }
 }
 
-window.Apple = window.classes.Apple = class Apple extends Shape{
-    constructor() {
-        super("positions", "normals", "texture_coords");
-
-        var m = Mat4.rotation(0*Math.PI, Vec.of(0, 0, 1));
-        let p = 20;
-        let n = 12;
-        let peel = 0.5
-        
-        this.positions.push([0, 0, 0]);
-        this.normals.push([0, 0, -1]);
-        for (let j = 0; j < m; j++){
-            if (j < p*2/3){
-                peel = peel +0.1;
-             }
-             else{
-             peel = peel -0.1;
-             }
-            for(let i = 0; i < n; i++){
-            this.positions.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j, 1)).to3());
-            this.normals.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j)).to3());
-        }
-
-        for (let k = 0; k < p*n; k++){
-            this.indices.push(k+1, i == p*n-1 ? 1 : i+2, p*n+1);
-        }
-
-        }
-        
-        
-    }
-
-}
-
-
-window.Leaf = window.classes.Leaf = class Leaf extends Shape {
-    constructor(base_length) {
+window.Leaf = window.classes.Leaf = class Leaf extends Spike {
+    constructor(base_length, base_theta, base_phi) {
         super("positions", "normals");
         
         var n = 20;
-//         var remainder = base_theta%(Math.PI*2/n);
+        var remainder = base_theta%(Math.PI*2/n);
         var m = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
 
-        var len = base_length;
-        var wid = base_length/2;
+        var len = 10;
+        var wid = 5;
 
 //        right side
         var w = 0;
@@ -124,19 +90,18 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
                 else{
                     this.positions.push(m.times(Vec.of(w,0,l)).to3());
                     this.normals.push(m.times(Vec.of(w,0,l)).to3());
-                    this.positions.push(m.times(Vec.of(w-wid/n/5,0, l-len/n*2)).to3());
-                    this.normals.push(m.times(Vec.of(w-wid/n/5,0, l-len/n*2)).to3());
-                    w = w - wid/n/2;
-                    l = l -len/n/2;
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
                 }
 
                
                 this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
                 this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
-
-            
-
         }
+
+
 
         for (let i = 0; i < 3*n; i++){
            this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
@@ -150,7 +115,7 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
      
 
         for (let i = 0; i < n; i++){
-             if(i < 1/2*n){
+            if(i < 1/2*n){
                     this.positions.push(m.times(Vec.of(w,0,l)).to3());
                     this.normals.push(m.times(Vec.of(w,0,l)).to3());
                     this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3());
@@ -162,10 +127,168 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
                 else{
                     this.positions.push(m.times(Vec.of(w,0,l)).to3());
                     this.normals.push(m.times(Vec.of(w,0,l)).to3());
-                    this.positions.push(m.times(Vec.of(w-wid/n/5,0, l-len/n*2)).to3());
-                    this.normals.push(m.times(Vec.of(w-wid/n/5,0, l-len/n*2)).to3());
-                    w = w - wid/n/2;
-                    l = l -len/n/2;
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
+                }
+
+               
+                this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
+                this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+        }
+
+
+
+        for (let i = 3*n; i < 6*n; i++){
+           this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
+        }
+
+    }
+}
+
+
+window.Grape = window.classes.Grape = class Grape extends Spike {
+    constructor(base_length, base_theta, base_phi) {
+        super("positions", "normals", "texture_coords");
+
+//          // Start from the following equilateral tetrahedron:
+//         this.positions.push(...Vec.cast([0, 0, -1], [0, .9428, .3333], [-.8165, -.4714, .3333], [.8165, -.4714, .3333]));
+
+//         // Begin recursion.
+//         this.subdivideTriangle(0, 1, 2, 10);
+//         this.subdivideTriangle(3, 2, 1, 10);
+//         this.subdivideTriangle(1, 0, 3, 10);
+//         this.subdivideTriangle(0, 2, 3, 10);
+
+//         for (let p of this.positions) {
+//             this.normals.push(p.copy());
+//             this.texture_coords.push(Vec.of(
+//                 0.5 + Math.atan2(p[2], p[0]) / (2 * Math.PI),
+//                 0.5 - Math.asin(p[1]) / Math.PI));
+//         }
+
+//         // Fix the UV seam by duplicating vertices with offset UV
+//         let tex = this.texture_coords;
+//         for (let i = 0; i < this.indices.length; i += 3) {
+//             const a = this.indices[i], b = this.indices[i + 1], c = this.indices[i + 2];
+//             if ([[a, b], [a, c], [b, c]].some(x => (Math.abs(tex[x[0]][0] - tex[x[1]][0]) > 0.5))
+//                 && [a, b, c].some(x => tex[x][0] < 0.5))
+//             {
+//                 for (let q of [[a, i], [b, i + 1], [c, i + 2]]) {
+//                     if (tex[q[0]][0] < 0.5) {
+//                         this.indices[q[1]] = this.positions.length;
+//                         this.positions.push(this.positions[q[0]].copy());
+//                         this.normals.push(this.normals[q[0]].copy());
+//                         tex.push(tex[q[0]].plus(Vec.of(1, 0)));
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+//     subdivideTriangle(a, b, c, count) {
+//         if (count <= 0) {
+//             this.indices.push(a, b, c);
+//             return;
+//         }
+
+//         let ab_vert = this.positions[a].mix(this.positions[b], 0.5).normalized(),
+//             ac_vert = this.positions[a].mix(this.positions[c], 0.5).normalized(),
+//             bc_vert = this.positions[b].mix(this.positions[c], 0.5).normalized();
+
+//         let ab = this.positions.push(ab_vert) - 1,
+//             ac = this.positions.push(ac_vert) - 1,
+//             bc = this.positions.push(bc_vert) - 1;
+
+//         this.subdivideTriangle( a, ab, ac, count - 1);
+//         this.subdivideTriangle(ab,  b, bc, count - 1);
+//         this.subdivideTriangle(ac, bc,  c, count - 1);
+//         this.subdivideTriangle(ab, bc, ac, count - 1);
+//     }
+    }
+    
+
+    }
+
+window.Leaf = window.classes.Leaf = class Leaf extends Spike {
+    constructor(base_length, base_theta, base_phi) {
+        super("positions", "normals");
+        
+        var n = 20;
+        var remainder = base_theta%(Math.PI*2/n);
+        var m = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+
+        var len = 10;
+        var wid = 5;
+
+//        right side
+        var w = 0;
+        var l = len;
+
+        this.positions.push([0,0,0]);
+        this.normals.push([0,0,-1]);
+
+        for (let i = 0; i < n; i++){
+                
+                if(i < 1/2*n){
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3());
+                    this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3()); 
+                    w = w+wid/n;
+                    l = l-len/n;
+
+                }
+                else{
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
+                }
+
+               
+                this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
+                this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+
+            
+
+        }
+
+
+
+
+
+        for (let i = 0; i < 3*n; i++){
+           this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
+        }
+
+//         left side
+        var w = 0;
+        var l = len;
+
+        var m = Mat4.rotation(0*Math.PI, Vec.of(0, 0, 1));
+     
+
+        for (let i = 0; i < n; i++){
+            if(i < 1/2*n){
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3());
+                    this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5,0, l-len/n+len/n/4)).to3()); 
+                    w = w+wid/n;
+                    l = l-len/n;
+
+                }
+                else{
+                    this.positions.push(m.times(Vec.of(w,0,l)).to3());
+                    this.normals.push(m.times(Vec.of(w,0,l)).to3());
+                    this.positions.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    this.normals.push(m.times(Vec.of(w-wid/n-wid/n/2,0, l-len/n+len/n/10)).to3());
+                    w = w - wid/n;
+                    l = l -len/n
                 }
 
                
@@ -298,7 +421,7 @@ window.Cube = window.classes.Cube = class Cube extends Shape {
 }
 
 
-window.SimpleCube = window.classes.SimpleCube = class SimpleCube extends Shape { 
+window.SimpleCube = window.classes.SimpleCube = class SimpleCube extends Shape {
     constructor() {
       super( "positions", "normals", "texture_coords" );
       for( var i = 0; i < 3; i++ )                    
