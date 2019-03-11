@@ -425,7 +425,7 @@ class Vertex_Buffer {
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, Mat.flatten_2D_to_1D(this[n]), gl.STATIC_DRAW);
         }
-            if (this.indexed && write_to_indices) {
+        if (this.indexed && write_to_indices) {
             // Load an extension to allow shapes with more vertices than type "short" can hold.
             gl.getExtension("OES_element_index_uint"); 
             this.index_buffer = gl.createBuffer();

@@ -28,6 +28,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
             'ball': new Subdivision_Sphere(4)
+       
+            
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
@@ -125,78 +127,36 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     initialize_demo() {
-// <<<<<<< HEAD
-        var end = new TreeBranchEnd();
-
-        var spike0 = new TreeSegment(6, Math.PI*0, -Math.PI*1/8);
-
-        var segA1 = new TreeSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new TreeBranch(1.5, Math.PI*0, .95);
-        var segA2 = new TreeSegment(2, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
-        //openA2                                                                                                                                                                 
-        //endA2                                                                                                                                                                  
-        var segA3 = new TreeSegment(2, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
-        //openA3                                                                                                                                                                 
-
-        var branchB1 = new TreeBranch(-.2, Math.PI*0, .69);
-        var branchB2 = new TreeBranch(-.2, Math.PI*2/5, .7);
-        var branchB3 = new TreeBranch(-.2, Math.PI*4/5, .71);
-        var branchB4 = new TreeBranch(-.2, Math.PI*6/5, .73);
-        var branchB5 = new TreeBranch(-.2, Math.PI*8/5, .72);
-
-        var segC1 = new TreeSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
-        var segC2 = new TreeSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
-
-      
-        var b_c = .45;
-        var ruleA = new TreeProductionRule(20, [branchA2, segA2, end, segA1, segA3]);
-        var ruleB = new TreeProductionRule(b_c*0.2, [branchB1, end, branchB2, end]);
-// =======
-        var end = new StaticBranchEnd();
-        var spike0 = new StaticSegment(6, Math.PI*0, -Math.PI*1/8);
-        var segA1 = new StaticSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
-        var branchA2 = new StaticBranch(1.5, Math.PI*0, .95);
-        var segA2 = new StaticSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
-        var segA3 = new StaticSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
-        var branchB1 = new StaticBranch(-.2, Math.PI*0, .69);
-        var branchB2 = new StaticBranch(-.2, Math.PI*2/5, .7);
-        var branchB3 = new StaticBranch(-.2, Math.PI*4/5, .71);
-        var branchB4 = new StaticBranch(-.2, Math.PI*6/5, .73);
-        var branchB5 = new StaticBranch(-.2, Math.PI*8/5, .72);
-        var segC1 = new StaticSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
-        var segC2 = new StaticSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
-        var b_c = .45;
-        var ruleA = new StaticRule(20, [branchA2, segA2, end, segA1, segA3]);
-        var ruleB = new StaticRule(b_c, [branchB1, end, branchB2, end,
-// >>>>>>> master
-                                            branchB3, end, branchB4, end, branchB5, end])
-        var ruleC = new StaticRule(b_c*.8, [segC1, segC2, spike0]);
-        var tree_prod = new StaticTree([ruleC, ruleB, ruleA]);
-        this.tree_model = tree_prod.get_model();
-        this.tree_model.copy_onto_graphics_card(this.cont.gl);
-
-
-        //get model 2
-//         var branch1 = new TreeBranch(-1, Math.PI*0, 0.8);
-//         var branch2 = new TreeBranch(1, Math.PI*1, 0.8);
-//         var s1 = new TreeSegment(5,Math.PI*1/20, -Math.PI*0/7, 0.5, Math.PI/2, Math.PI*0/9);
-//         var leaf0 = new TreeSegment(6, Math.PI*0, -Math.PI*1/8, 1); 
-        
-
-//         var ruleD = new TreeProductionRule(10, [s1, branch2, s1, end ,branch1, s1, end, s1])
-//         var ruleE = new TreeProductionRule(.1, [segC1, segC2, leaf0]);
-        
-//         var tree_prod2 = new TreeProduction([ruleE, ruleD])
-
-//         this.tree_prod = tree_prod2;
-//         this.tree_model = tree_prod2.get_model();
+    
+           var lf = new Leaf(50);
+           this.leaf = lf;
+           this.leaf.copy_onto_graphics_card(this.cont.gl);
+//         var end = new StaticBranchEnd();
+//         var spike0 = new StaticSegment(6, Math.PI*0, -Math.PI*1/8);
+//         var segA1 = new StaticSegment(4, Math.PI*21/23, Math.PI*0, .95, Math.PI*0, Math.PI*1/8);
+//         var branchA2 = new StaticBranch(1.5, Math.PI*0, .95);
+//         var segA2 = new StaticSegment(4, Math.PI*1, Math.PI*1/5, .8, Math.PI*1, Math.PI*1/11);
+//         var segA3 = new StaticSegment(5, Math.PI*10/7, Math.PI*0, .8, Math.PI*1, Math.PI*1/9);
+//         var branchB1 = new StaticBranch(-.2, Math.PI*0, .69);
+//         var branchB2 = new StaticBranch(-.2, Math.PI*2/5, .7);
+//         var branchB3 = new StaticBranch(-.2, Math.PI*4/5, .71);
+//         var branchB4 = new StaticBranch(-.2, Math.PI*6/5, .73);
+//         var branchB5 = new StaticBranch(-.2, Math.PI*8/5, .72);
+//         var segC1 = new StaticSegment(4, Math.PI*1/20, Math.PI*-1/5, .9, Math.PI*1, Math.PI*2/9);
+//         var segC2 = new StaticSegment(4, Math.PI*-1/15, Math.PI*-1/15, .7, Math.PI*1, Math.PI*-3/9);
+//         var b_c = .45;
+//         var ruleA = new StaticRule(20, [branchA2, segA2, end, segA1, segA3]);
+//         var ruleB = new StaticRule(b_c, [branchB1, end, branchB2, end,
+//                                             branchB3, end, branchB4, end, branchB5, end])
+//         var ruleC = new StaticRule(b_c*.8, [segC1, segC2, spike0]);
+//         var tree_prod = new StaticTree([ruleC, ruleB, ruleA]);
+//         this.tree_model = tree_prod.get_model();
 //         this.tree_model.copy_onto_graphics_card(this.cont.gl);
 
     }
 
-    play_demo() {
-        var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        this.tree_model.draw(this.gs, R, this.bone);
+    play_demo(t) {
+        
     }
 
 
@@ -212,9 +172,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //draw axes
         this.draw_axes(12);
+        this.play_demo(t);
 
-	//draw example StaticTree
-	this.play_demo();
+
+       this.leaf.draw(this.gs, Mat4.identity(), this.bone);
 
     }
 }
