@@ -163,17 +163,37 @@ class Assignment_Two_Skeleton extends Scene_Component {
     
         this.tree_prod = tree_prod;
 
+        this.saved_trees = new SavedTrees();
+
+        this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_3.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_4.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_5.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_6.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.spike_tree_7.copy_onto_graphics_card(this.cont.gl);
+
     }
 
     play_demo(t) {
-        var R = Mat4.rotation(-Math.PI*1/2, Vec.of(1, 0, 0));
-        let period = 8;
-        let rootp = Math.sqrt(period);
-        if (t%(period) < period) {
-            this.tree_model = this.tree_prod.private_get_model(.22+(Math.sqrt(t%period)/rootp)*.78, Mat4.identity());
-        }
-        this.tree_model.copy_onto_graphics_card(this.cont.gl);
-        this.tree_model.draw(this.gs, R, this.bone);
+        let m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
+        
+        let T = Mat4.translation(Vec.of(50, 0, 0));
+        
+        this.saved_trees.spike_tree_1.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_2.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_3.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_4.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_5.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_6.draw(this.gs, m, this.bone);
+        m = m.times(T);
+        this.saved_trees.spike_tree_7.draw(this.gs, m, this.bone);
+        m = m.times(T);
     }
 
 
