@@ -98,6 +98,90 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
 }
 
 
+window.Apple = window.classes.Apple = class Apple extends Shape{
+    constructor() {
+        super("positions", "normals", "texture_coords");
+        let p = 10;
+        let n = 12;
+        let peel = 0.1;
+
+        var m = Mat4.identity();
+        
+        this.positions.push([0, 0, 0]);
+        this.normals.push([0, 0, -1]);
+        for (let j = 0; j < p; j++){
+            
+        }
+
+	
+        this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
+        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
+	
+        for (let k = 0; k < p*n; k++){
+            this.indices.push(k+1, k == p*n-1 ? 1 : k+2, p*n+1);
+        }
+
+    }
+        
+        
+}
+
+
+
+window.Leaf = window.classes.Leaf = class Leaf extends Shape {
+    constructor(side, size){
+        super ("positions", "normals")
+	let n = 20;
+	let len = size;
+	let wid = size/2;
+	let w = 0;
+	let l = len;
+	let m = Mat4.rotation(Math.PI, Vec.of(0, 1, 0));
+	if (side<0){
+            m = Mat4.rotation(0*Math.PI, Vec.of(0, 1, 0));
+	}
+	
+	this.positions.push([0, 0, 0]);
+	this.normals.push([0, 0, -side]);
+	
+	
+	for (let i = 0; i < n; i++){
+            let inc = side*i/100;
+            if(i < 1/2*n){
+                this.positions.push(m.times(Vec.of(w,l,inc)).to3());
+                this.normals.push(m.times(Vec.of(w,l,inc)).to3());
+                this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5, l-len/n+len/n/4, inc)).to3());
+                this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5, l-len/n+len/n/4, inc)).to3()); 
+                w = w+wid/n;
+                l = l-len/n;
+		
+            }
+            else{
+                this.positions.push(m.times(Vec.of(w,l,inc)).to3());
+                this.normals.push(m.times(Vec.of(w,l,inc)).to3());
+                this.positions.push(m.times(Vec.of(w-wid/n/5, l-len/n*2, inc)).to3());
+                this.normals.push(m.times(Vec.of(w-wid/n/5, l-len/n*2, inc)).to3());
+                w = w - wid/n/2;
+                l = l -len/n/2;
+            }
+	    
+            
+            this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
+            this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+        }
+        
+        this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
+        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
+	
+        for (let i = 0; i < 3*n; i++){
+            this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);
+        }
+	
+	
+    }
+    
+}
+
 window.Square = window.classes.Square = class Square extends Shape {
     constructor() {
         super("positions", "normals", "texture_coords");
