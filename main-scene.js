@@ -190,8 +190,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     
     draw_grower(m, t) {
-	let ntime = 40;
-	let fps = 10;
+	let ntime = 20;
+	let fps = 5;
 	if (t < 0 || t > ntime) {
 	    //do nothing
 	    return;
@@ -335,10 +335,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
     play_demo(t) {
         let m = Mat4.identity();
 
-		let d1 = 20;
-		let d2 = 10;
+		let d1 = 5;
+		let d2 = 5;
         let d3 = .5;
-        let d4 = 40;
+        let d4 = 20;
         if (t < d1) {
         	this.phase_1(t, d1);
         }
@@ -434,7 +434,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 		
         //draw axes
-        this.play_demo(t-30);
+        this.play_demo(t);
 
     }
 }
