@@ -149,7 +149,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 	    return;
 	}
 	let index = Math.floor(t*fps);
-	let s = Math.sqrt(index)/20;
+	let s = Math.sqrt(index)/80 + index/800;
 	let S = Mat4.scale(Vec.of(s, s, s));
 	this.saved_trees.grower[index].complex_draw(m.times(S), this.gs);
     }

@@ -163,20 +163,20 @@ class SavedTrees {
 
         var seg0 = new GrowingSegment(0, 0, 0, 1, 0 ,0);
         var branch0 = new GrowingBranch(0, 0, 0);
-        var spike1 = new GrowingSegment(4, 0, 0, 0, 0, 0);
-        var spike2 = new GrowingSegment(7, 0, 0, 0, 0, 0);
+        var spike1 = new GrowingSegment(6, 0, 0, 0, 0, 0);
+        var spike2 = new GrowingSegment(10, 0, 0, 0, 0, 0);
 
-        var seg1 = new GrowingSegment(4, Math.PI*0, Math.PI*-.15, .92, -Math.PI*0, Math.PI*0);
-        var seg2 = new GrowingSegment(4, Math.PI*0, Math.PI*0, .92, Math.PI*0, -Math.PI*0);
-        var seg3 = new GrowingSegment(4, -Math.PI*.7, Math.PI*.05, .92, Math.PI*0, Math.PI*.2);
-        var seg4 = new GrowingSegment(6, Math.PI*.2, -Math.PI*.05, .6, Math.PI*0, Math.PI*0);
+        var seg1 = new GrowingSegment(6, Math.PI*0, Math.PI*-.15, .92, -Math.PI*0, Math.PI*0);
+        var seg2 = new GrowingSegment(6, Math.PI*0, Math.PI*0, .92, Math.PI*0, -Math.PI*0);
+        var seg3 = new GrowingSegment(6, -Math.PI*.7, Math.PI*.05, .92, Math.PI*0, Math.PI*.2);
+        var seg4 = new GrowingSegment(9, Math.PI*.2, -Math.PI*.05, .6, Math.PI*0, Math.PI*0);
 
-        var branch1 = new GrowingBranch(2, Math.PI*.9, .8);
-        var branch3 = new GrowingBranch(2, Math.PI*0, .6);
+        var branch1 = new GrowingBranch(3, Math.PI*.9, .8);
+        var branch3 = new GrowingBranch(3, Math.PI*0, .6);
 
         var ruleA = new GrowingRule(1, [branch1, seg1, end, seg2, branch3, end, seg3]);
         var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
-        var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
+        var ruleC = new GrowingRule(b_c*b_c, [branch1, spike2, end, seg4, spike1]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
         tree_prod.init(this.gl);
