@@ -27,7 +27,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'box': new Cube(),
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
-            'ball': new Subdivision_Sphere(4)
+            'ball': new Subdivision_Sphere(4),
+	    'rock': new Rock(1)
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
@@ -54,7 +55,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         // Load some textures for the demo shapes
         this.shape_materials = {};
         const shape_textures = {
-            square: "assets/butterfly.png",
+            square: "assets/grass.jpg",
             box: "assets/even-dice-cubemap.png",
             ball: "assets/soccer_sph_s_resize.png",
             cylinder: "assets/treebark.png",
@@ -127,91 +128,30 @@ class Assignment_Two_Skeleton extends Scene_Component {
     initialize_demo() {
 
         this.saved_trees = new SavedTrees(this.cont);
-
-        //this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
-        /*this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_3.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_4.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_5.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_6.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_7.copy_onto_graphics_card(this.cont.gl);
-
-        this.saved_trees.cont_tree_1.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_2.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_3.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_4.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_5.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_6.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.cont_tree_7.copy_onto_graphics_card(this.cont.gl);
-
-	
-        this.saved_trees.big_cont_tree_1.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_2.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_3.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_4.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_5.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_6.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_7.copy_onto_graphics_card(this.cont.gl);*/
-
     }
 
     play_demo(t) {
-        let m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
+        let m = Mat4.identity();
         
-        let T = Mat4.translation(Vec.of(50, 0, 0));
-        
-        this.saved_trees.spike_tree_1.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_2.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_3.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_4.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_5.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_6.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.spike_tree_7.complex_draw(m, this.gs);
-
-        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.5, .5, .5));
-        m = m.times(Mat4.translation(Vec.of(0, 30, 0)));
-        T = Mat4.translation(Vec.of(25, 0, 0));
-        
-        this.saved_trees.cont_tree_1.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_2.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_3.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_4.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_5.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_6.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.cont_tree_7.complex_draw(m, this.gs);
-
-        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
-        m = m.times(Mat4.translation(Vec.of(0, 120, 0)));
-        T = Mat4.translation(Vec.of(50, 0, 0));
-        
-        this.saved_trees.big_cont_tree_1.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_2.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_3.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_4.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_5.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_6.complex_draw(m, this.gs);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_7.complex_draw(m, this.gs);
+	this.draw_walk_ups(m);
+	
     }
 
 
+    draw_walk_ups(m) {
+	let wus = this.saved_trees.walk_up_trees;
+	for (let i = 0; i < wus.length; i++) {
+	    let R = Mat4.rotation(4*i, Vec.of(0, 0, 1));
+	    let s = .6;
+	    let S = Mat4.scale(Vec.of(wus[i][0]*s, wus[i][0]*s, wus[i][0]*s));
+	    let T = Mat4.translation(Vec.of(wus[i][1]*4+(1-2*(i%2))*15, wus[i][2]*2+i*6, 0));
+	    let M = m.times(T).times(R).times(S);
+	    wus[i][3].complex_draw(M, this.gs);
+	}
+	
+    }
+
+    
     display(graphics_state) {
         this.gs = graphics_state;
         // Use the lights stored in this.lights.

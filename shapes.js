@@ -116,6 +116,66 @@ window.Segment = window.classes.Segment = class Segment extends Shape {
     }
 }
 
+window.Rock = window.classes.Rock = class Rock extends Shape {
+     constructor(max_subdivisions) {
+        super("positions", "normals", "texture_coords");
+
+        // Start from the following equilateral tetrahedron:
+        this.positions.push(...Vec.cast([0, 0, -1], [0, .8428, .5333], [-.9165, .0, .3333], [.8165, -.0, .3333]));
+
+        // Begin recursion.
+        this.subdivideTriangle(0, 1, 2, max_subdivisions);
+        this.subdivideTriangle(3, 2, 1, max_subdivisions);
+        this.subdivideTriangle(1, 0, 3, max_subdivisions);
+        this.subdivideTriangle(0, 2, 3, max_subdivisions);
+
+        for (let p of this.positions) {
+            this.normals.push(p.copy());
+            this.texture_coords.push(Vec.of(
+                0.5 + Math.atan2(p[2], p[0]) / (2 * Math.PI),
+                0.5 - Math.asin(p[1]) / Math.PI));
+        }
+
+        // Fix the UV seam by duplicating vertices with offset UV
+        let tex = this.texture_coords;
+        for (let i = 0; i < this.indices.length; i += 3) {
+            const a = this.indices[i], b = this.indices[i + 1], c = this.indices[i + 2];
+            if ([[a, b], [a, c], [b, c]].some(x => (Math.abs(tex[x[0]][0] - tex[x[1]][0]) > 0.5))
+                && [a, b, c].some(x => tex[x][0] < 0.5))
+            {
+                for (let q of [[a, i], [b, i + 1], [c, i + 2]]) {
+                    if (tex[q[0]][0] < 0.5) {
+                        this.indices[q[1]] = this.positions.length;
+                        this.positions.push(this.positions[q[0]].copy());
+                        this.normals.push(this.normals[q[0]].copy());
+                        tex.push(tex[q[0]].plus(Vec.of(1, 0)));
+                    }
+                }
+            }
+        }
+    }
+
+    subdivideTriangle(a, b, c, count) {
+        if (count <= 0) {
+            this.indices.push(a, b, c);
+            return;
+        }
+
+        let ab_vert = this.positions[a].mix(this.positions[b], 0.5).normalized(),
+            ac_vert = this.positions[a].mix(this.positions[c], 0.5).normalized(),
+            bc_vert = this.positions[b].mix(this.positions[c], 0.5).normalized();
+
+        let ab = this.positions.push(ab_vert) - 1,
+            ac = this.positions.push(ac_vert) - 1,
+            bc = this.positions.push(bc_vert) - 1;
+
+        this.subdivideTriangle( a, ab, ac, count - 1);
+        this.subdivideTriangle(ab,  b, bc, count - 1);
+        this.subdivideTriangle(ac, bc,  c, count - 1);
+        this.subdivideTriangle(ab, bc, ac, count - 1);
+    }
+
+}
 
 window.Apple = window.classes.Apple = class Apple extends Shape{
     constructor() {
@@ -150,7 +210,7 @@ window.Apple = window.classes.Apple = class Apple extends Shape{
 window.Leaf = window.classes.Leaf = class Leaf extends Shape {
     constructor(side, size){
         super ("positions", "normals")
-	let n = 20;
+	let n = 8;
 	let len = size;
 	let wid = size/2;
 	let w = 0;
@@ -168,29 +228,29 @@ window.Leaf = window.classes.Leaf = class Leaf extends Shape {
             let inc = side*i/100;
             if(i < 1/2*n){
                 this.positions.push(m.times(Vec.of(w,l,inc)).to3());
-                this.normals.push(m.times(Vec.of(w,l,inc)).to3());
+                this.normals.push(m.times(Vec.of(0,0,-1)).to3());
                 this.positions.push(m.times(Vec.of(w+wid/n+wid/n/5, l-len/n+len/n/4, inc)).to3());
-                this.normals.push(m.times(Vec.of(w+wid/n+wid/n/5, l-len/n+len/n/4, inc)).to3()); 
+                this.normals.push(m.times(Vec.of(-.1, -.15, -1)).to3()); 
                 w = w+wid/n;
                 l = l-len/n;
 		
             }
             else{
                 this.positions.push(m.times(Vec.of(w,l,inc)).to3());
-                this.normals.push(m.times(Vec.of(w,l,inc)).to3());
+                this.normals.push(m.times(Vec.of(0, 0, -1)).to3());
                 this.positions.push(m.times(Vec.of(w-wid/n/5, l-len/n*2, inc)).to3());
-                this.normals.push(m.times(Vec.of(w-wid/n/5, l-len/n*2, inc)).to3());
+                this.normals.push(m.times(Vec.of(-.1, -.15, -1)).to3());
                 w = w - wid/n/2;
                 l = l -len/n/2;
             }
 	    
             
             this.positions.push(m.times(Vec.of(0,0,0,1)).to3());
-            this.normals.push(m.times(Vec.of(0,0,0,1)).to3());
+            this.normals.push(m.times(Vec.of(0,0,-1,1)).to3());
         }
         
         this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
-        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
+        this.normals.push(m.times(Vec.of(0, 0, -1, 0)).to3() );
 	
         for (let i = 0; i < 3*n; i++){
             this.indices.push(i+1, i == 3*n-1 ? 1 : i+2, 3*n+1);

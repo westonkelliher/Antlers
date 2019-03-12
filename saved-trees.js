@@ -10,33 +10,82 @@ class SavedTrees {
 	    diffusivity: .4,
 	    specularity: .1
 	});
-	this.light_green = context.get_instance(Phong_Shader).material(Color.of(.5, .9, .5, 1), {
+	this.dark_brown = context.get_instance(Phong_Shader).material(Color.of(.5, .3, .0, 1), {
 	    ambient: .4,
-	    diffusivity: .4
+	    diffusivity: .4,
+	    specularity: .1
+	});
+	this.light_green = context.get_instance(Phong_Shader).material(Color.of(.3, .9, .3, 1), {
+	    ambient: .4,
+	    diffusivity: .4,
+	    specularity: .3
+	});
+	this.dark_green = context.get_instance(Phong_Shader).material(Color.of(.0, .35, .05, 1), {
+	    ambient: .4,
+	    diffusivity: .4,
+	    specularity: .3
+	});
+	this.yellow_green = context.get_instance(Phong_Shader).material(Color.of(.6, .85, .2, 1), {
+	    ambient: .4,
+	    diffusivity: .4,
+	    specularity: .3
 	});
 
 	this.spike_tree_1 = this.get_spike_tree(.95);
-	this.spike_tree_2 = this.get_spike_tree(.9);
-	this.spike_tree_3 = this.get_spike_tree(.85);
-	this.spike_tree_4 = this.get_spike_tree(.8);
-	this.spike_tree_5 = this.get_spike_tree(.75);
-	this.spike_tree_6 = this.get_spike_tree(.7);
-	this.spike_tree_7 = this.get_spike_tree(.65);
-	this.cont_tree_1 = this.get_cont1_tree(.5);
-	this.cont_tree_2 = this.get_cont1_tree(.45);
-	this.cont_tree_3 = this.get_cont1_tree(.4);
-	this.cont_tree_4 = this.get_cont1_tree(.35);
-	this.cont_tree_5 = this.get_cont1_tree(.3);
-	this.cont_tree_6 = this.get_cont1_tree(.25);
-	this.cont_tree_7 = this.get_cont1_tree(.2);
 
-	this.big_cont_tree_1 = this.get_big_cont_tree(.6);
-	this.big_cont_tree_2 = this.get_big_cont_tree(.55);
-	this.big_cont_tree_3 = this.get_big_cont_tree(.5);
-	this.big_cont_tree_4 = this.get_big_cont_tree(.45);
-	this.big_cont_tree_5 = this.get_big_cont_tree(.4);
-	this.big_cont_tree_6 = this.get_big_cont_tree(.35);
-	this.big_cont_tree_7 = this.get_big_cont_tree(.3);
+	
+	this.spike_tree_2 = this.get_spike_tree(.9);
+	this.big_cont_tree_1 = this.get_big_cont_tree(.8);
+
+
+	this.wu1 = this.get_spike_tree(.97);
+	this.wu2 = this.get_spike_tree(.96);
+	this.wu3 = this.get_spike_tree(.95);
+	this.wu4 = this.get_cont1_tree(.70);
+	this.wu5 = this.get_spike_tree(.94);
+	this.wu6 = this.get_cont1_tree(.69);
+	this.wu7 = this.get_cont1_tree(.67);
+	this.wu8 = this.get_spike_tree(.93);
+	this.wu9 = this.get_spike_tree(.92);
+	this.wu10 = this.get_cont1_tree(.62);
+	this.wu11 = this.get_spike_tree(.91);
+	this.wu12 = this.get_cont1_tree(.60);
+	this.wu13 = this.get_cont1_tree(.58);
+	this.wu14 = this.get_cont1_tree(.56);
+	this.wu15 = this.get_spike_tree(.90);
+	this.wu16 = this.get_spike_tree(.89);
+	this.wu17 = this.get_cont1_tree(.54);
+	this.wu18 = this.get_cont1_tree(.52);
+	this.wu19 = this.get_spike_tree(.88);
+	this.wu20 = this.get_spike_tree(.87);
+
+	//                    scale, x, y, model
+	this.walk_up_trees = [[.05, 0, 0, this.wu1],
+			      [.06, .6, .5, this.wu2],
+			      [.08, .8, -.2, this.wu3],
+			      [.14, -.3, .5, this.wu4],
+			      [.10, .2, .8, this.wu5],
+			      [.17, .4, 9, this.wu6],
+			      [.18, -.7, .4, this.wu7],
+			      [.14, .8, -.9, this.wu8],
+			      [.13, -.6, -.2, this.wu9],
+			      [.20, .2, -.9, this.wu10],
+			      [.16, -.9, .5, this.wu11],
+			      [.23, .8, -.1, this.wu12],
+			      [.24, .6, .1, this.wu13],
+			      [.25, -.4, -.2, this.wu14],
+			      [.20, -.7, -.2, this.wu15],
+			      [.21, .6, .01, this.wu16],
+			      [.30, -.3, -.3, this.wu17],
+			      [.31, -.9, -.8, this.wu18],
+			      [.24, .4, .7, this.wu19],
+			      [.25, .5, .2, this.wu20],
+			      
+
+			     ];
+
+	
+	
     }
     
     get_spike_tree(b_c) {
@@ -67,7 +116,7 @@ class SavedTrees {
         let ruleD = new StaticRule(b_c*b_c*.6, [segC1, segC2, spike0]);
         let ruleE = new StaticRule(b_c*b_c, [branchA2, segA2, end, segA1, segA3]);
 
-        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
+        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA], this.leaf_model_1, this.dark_green, this.dark_brown);
 		tree_prod.init(this.gl);
 	return tree_prod.get_model();
     }
@@ -92,7 +141,7 @@ class SavedTrees {
         var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
-        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.yellow_green, this.light_brown);
         tree_prod.init(this.gl);
 
 	return tree_prod.get_model();
@@ -120,7 +169,7 @@ class SavedTrees {
         var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
-        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.yellow_green, this.light_brown);
         tree_prod.init(this.gl);
 
 	return tree_prod.get_model();
