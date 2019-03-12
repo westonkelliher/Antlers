@@ -1,5 +1,25 @@
 // includes MultiShape, Segment, and Spike
 
+window.ComplexShape = window.classes.ComplexShape = class ComplexShape extends Shape {
+    constructor(gl, subgroups) { //subgroups is [ [multishape0, material0], [multishape1, material1], ...]
+	super("positions", "normals");
+	this.gl = gl;
+	this.subgroups = subgroups;
+
+	for (let i = 0; i < this.subgroups.length; i++) {
+	    this.subgroups[i][0].copy_onto_graphics_card(gl)
+	}
+    }
+
+
+    complex_draw(m, gs) {
+	console.log('drw');
+	for (let i = 0; i < this.subgroups.length; i++) {
+	    this.subgroups[i][0].draw(gs, m, this.subgroups[i][1]);
+	}
+    }	
+    
+}
 
 window.MultiShape = window.classes.MultiShape = class MultiShape extends Shape {
     constructor(shapes) {   //[M1, Shape1], [M2, Shape2], ... 

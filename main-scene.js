@@ -126,10 +126,12 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     initialize_demo() {
 
-        this.saved_trees = new SavedTrees(this.cont.gl, this.gs );
+        console.log('1');
+        this.saved_trees = new SavedTrees(this.cont);
 
-        this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
+        console.log('a');
+        //this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
+        /*this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_3.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_4.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_5.copy_onto_graphics_card(this.cont.gl);
@@ -151,7 +153,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         this.saved_trees.big_cont_tree_4.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.big_cont_tree_5.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.big_cont_tree_6.copy_onto_graphics_card(this.cont.gl);
-        this.saved_trees.big_cont_tree_7.copy_onto_graphics_card(this.cont.gl);
+        this.saved_trees.big_cont_tree_7.copy_onto_graphics_card(this.cont.gl);*/
 
     }
 
@@ -160,8 +162,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
         
         let T = Mat4.translation(Vec.of(50, 0, 0));
         
-        this.saved_trees.spike_tree_1.draw(this.gs, m, this.bone);
-        m = m.times(T);
+        this.saved_trees.spike_tree_1.complex_draw(m, this.gs);
+        /*m = m.times(T);
         this.saved_trees.spike_tree_2.draw(this.gs, m, this.bone);
         m = m.times(T);
         this.saved_trees.spike_tree_3.draw(this.gs, m, this.bone);
@@ -208,7 +210,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         m = m.times(T);
         this.saved_trees.big_cont_tree_6.draw(this.gs, m, this.bone);
         m = m.times(T);
-        this.saved_trees.big_cont_tree_7.draw(this.gs, m, this.bone);
+        this.saved_trees.big_cont_tree_7.draw(this.gs, m, this.bone);*/
     }
 
 

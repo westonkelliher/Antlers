@@ -2,12 +2,23 @@
 //static trees
 
 class SavedTrees {
-    constructor(gl, gs) {
-	this.gl = gl;
-	this.gs = gs;
-	
+    constructor(context) {
+	this.gl = context.gl;
+	this.leaf_model_1 = new Leaf(.1, 10);
+	this.light_brown = context.get_instance(Phong_Shader).material(Color.of(.9, .7, .4, 1), {
+	    ambient: .4,
+	    diffusivity: .4,
+	    specularity: .1
+	});
+	this.light_green = context.get_instance(Phong_Shader).material(Color.of(.5, .9, .5, 1), {
+	    ambient: .4,
+	    diffusivity: .4
+	});
+
+	console.log('b');
 	this.spike_tree_1 = this.get_spike_tree(.95);
-	this.spike_tree_2 = this.get_spike_tree(.9);
+	console.log('E');
+	/*this.spike_tree_2 = this.get_spike_tree(.9);
 	this.spike_tree_3 = this.get_spike_tree(.85);
 	this.spike_tree_4 = this.get_spike_tree(.8);
 	this.spike_tree_5 = this.get_spike_tree(.75);
@@ -29,7 +40,7 @@ class SavedTrees {
 	this.big_cont_tree_5 = this.get_big_cont_tree(.4);
 	this.big_cont_tree_6 = this.get_big_cont_tree(.35);
 	this.big_cont_tree_7 = this.get_big_cont_tree(.3);
-
+	*/
     }
     
     get_spike_tree(b_c) {
@@ -60,7 +71,10 @@ class SavedTrees {
         let ruleD = new StaticRule(b_c*b_c*.6, [segC1, segC2, spike0]);
         let ruleE = new StaticRule(b_c*b_c, [branchA2, segA2, end, segA1, segA3]);
 
-        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA]);
+	console.log('c');
+        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
+		tree_prod.init(this.gl);
+	console.log('d');
 	return tree_prod.get_model();
     }
 
@@ -85,7 +99,7 @@ class SavedTrees {
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
-        tree_prod.init(this.gl, this.gs, this.bone);
+        tree_prod.init(this.gl);
 
 	return tree_prod.get_model();
     }
@@ -113,7 +127,7 @@ class SavedTrees {
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA]);
-        tree_prod.init(this.gl, this.gs, this.bone);
+        tree_prod.init(this.gl);
 
 	return tree_prod.get_model();
     
