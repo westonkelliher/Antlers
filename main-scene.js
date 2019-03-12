@@ -56,6 +56,11 @@ class Assignment_Two_Skeleton extends Scene_Component {
             diffusivity: .45,
             specularity: .1
         });
+        this.red = context.get_instance(Phong_Shader).material(Color.of(.9, .3, .2, 1), {
+            ambient: .4,
+            diffusivity: .45,
+            specularity: .1
+        });
 
         // Load some textures for the demo shapes
         this.shape_materials = {};
@@ -185,8 +190,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     
     draw_grower(m, t) {
-	let ntime = 10;
-	let fps = 5;
+	let ntime = 40;
+	let fps = 10;
 	if (t < 0 || t > ntime) {
 	    //do nothing
 	    return;
@@ -220,6 +225,18 @@ class Assignment_Two_Skeleton extends Scene_Component {
         }
     }
 
+    draw_rocks(m, x, y) {
+    	for(let i = -x; i <= x; i++){
+	    	for(let j = -y; j <= y; j++){
+                let T = Mat4.translation(Vec.of(i, j, 0));
+                let T2 = Mat4.translation(Vec.of(1, 0, 0))
+                let R = Mat4.rotation(i*2+j, Vec.of());
+                let M = m.times(T2).times(R).times(T);
+                this.shapes['rock'].draw(this.gs, M, this.bone);
+	    	}	
+        }
+    }
+
 	reset_cam() {
 		this.gs.camera_transform = Mat4.identity();
 		this.cam_mult(Mat4.rotation(Math.PI*.5, Vec.of(-1, 0, 0)));
@@ -229,7 +246,6 @@ class Assignment_Two_Skeleton extends Scene_Component {
 	}
 
 	from_to(start, end, t, duration) {
-		console.log(t/duration);
 		return start+(end-start)*(t/duration);
 	}
 
@@ -253,13 +269,56 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 	control_camera_2(t, duration) {
 		let start_height = 1;
-		let end_height = 4;
+		let end_height = 2;
 		let start_dist = 13;
-		let end_dist = 15;
+		let end_dist = 6;
 		let start_theta = Math.PI*3/2;
 		let end_theta = Math.PI*5/2;
 		let start_y = 0;
-		let end_y = -100;
+		let end_y = -110;
+		let start_look = Vec.of(0, 0, 0);
+		let T = Mat4.translation(start_look);
+		let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
+				-1*this.from_to(start_height, end_height, t, duration)));
+		let Theta = Mat4.rotation(this.from_to(start_theta, end_theta, t, duration), Vec.of(0,0,1));
+		let runT = Mat4.translation(Vec.of(0, this.from_to(start_y, end_y, t, duration), 0));
+		this.reset_cam();
+		this.cam_mult(Dist);
+		this.cam_mult(Theta);
+		this.cam_mult(T);
+		this.cam_mult(runT);
+	}
+	control_camera_3(t, duration) {
+		let start_height = 2;
+		let end_height = 2;
+		let start_dist = 6;
+		let end_dist = 5;
+		let start_theta = Math.PI*1/2;
+		let end_theta = Math.PI*1/2;
+		let start_y = -110;
+		let end_y = -118;
+		let start_look = Vec.of(0, 0, 0);
+		let T = Mat4.translation(start_look);
+		let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
+				-1*this.from_to(start_height, end_height, t, duration)));
+		let Theta = Mat4.rotation(this.from_to(start_theta, end_theta, t, duration), Vec.of(0,0,1));
+		let runT = Mat4.translation(Vec.of(0, this.from_to(start_y, end_y, t, duration), 0));
+		this.reset_cam();
+		this.cam_mult(Dist);
+		this.cam_mult(Theta);
+		this.cam_mult(T);
+		this.cam_mult(runT);
+	}
+
+	control_camera_4(t, duration) {
+		let start_height = 2;
+		let end_height = 6;
+		let start_dist = 5;
+		let end_dist = 50;
+		let start_theta = Math.PI*1/2;
+		let end_theta = Math.PI*4/2;
+		let start_y = -118;
+		let end_y = -118;
 		let start_look = Vec.of(0, 0, 0);
 		let T = Mat4.translation(start_look);
 		let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
@@ -276,11 +335,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
     play_demo(t) {
         let m = Mat4.identity();
 
-		let d1 = 2;
-		let d2 = 2;
-        let d3 = .3;
-        let d4 = 1;
-        let d5 = 10;
+		let d1 = 20;
+		let d2 = 10;
+        let d3 = .5;
+        let d4 = 40;
         if (t < d1) {
         	this.phase_1(t, d1);
         }
@@ -293,14 +351,13 @@ class Assignment_Two_Skeleton extends Scene_Component {
         else if (t < d1+d2+d3+d4) {
 			this.phase_4(t-d1-d2-d3, d4);
         }
-        else if (t < d1+d2+d3+d4+d5) {
-			this.phase_5(t-d1-d2-d3-d4, d5);
-        }
 
 		let S = Mat4.scale(Vec.of(3, 3, 1));
 		let T = Mat4.translation(Vec.of(0, 60, 0));
 		this.draw_grass(m.times(T).times(S), 5, 15);
-	
+		
+		this.draw_rocks(m.times(T).times(S), 3, 10);
+
         let T1 = Mat4.translation(Vec.of(0, 0, 0));
 		this.draw_walk_ups(T1);
 
@@ -312,7 +369,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 		if (!this.paused) {
 			this.control_camera_1(t%duration, duration);
 		}
-    }
+    }conso
 
 	phase_2(t, duration) {
 		let wait = duration/6;
@@ -321,56 +378,49 @@ class Assignment_Two_Skeleton extends Scene_Component {
 		}
 		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
         let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
-        let start_y = -20;
-        let end_y = 100;
+        let start_y = -25;
+        let end_y = 110;
         let runT = Mat4.translation(Vec.of(0, 0, this.from_to(start_y, end_y, t, duration)));
 		this.create_person(theta.times(tilt).times(runT), t);
+		let ballT = Mat4.translation(Vec.of(0, 4.25, 0));
+		let ballS = Mat4.scale(Vec.of(.8, .8, .8));
+		this.shapes['ball'].draw(this.gs, Mat4.identity().times(theta).times(tilt).times(runT).times(ballT).times(ballS), this.red);
 	}
 
 	phase_3(t, duration) {
 		if (!this.paused) {
-			//this.control_camera_3(t%duration, duration);
+			this.control_camera_3(t%duration, duration);
 		}
 		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
         let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
-        let start_y = -20;
-        let end_y = 100;
-        let T = Mat4.translation(Vec.of(0, 0, 100));
+        let start_y = -25;
+        let end_y = 110;
+        let T = Mat4.translation(Vec.of(0, 0, 110));
         let tripT = Mat4.translation(Vec.of(0, .2*t/duration, 3*t/duration));
         let fall_tilt = Mat4.rotation(Math.PI*.5*t/duration, Vec.of(1, 0, 0));
 		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
+		let ballT = Mat4.translation(Vec.of(0, 4.25, 0));
+		let ballS = Mat4.scale(Vec.of(.8, .8, .8));
+		this.shapes['ball'].draw(this.gs, theta.times(tilt).times(T).times(tripT).times(fall_tilt).times(ballT).times(ballS), this.red);
     }
 
     phase_4(t, duration) {
 		if (!this.paused) {
-			//this.control_camera_3(t%duration, duration);
+			this.control_camera_4(t%duration, duration);
 		}
 		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
         let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
-        let start_y = -20;
-        let end_y = 100;
-        let T = Mat4.translation(Vec.of(0, 0, 100));
-        let tripT = Mat4.translation(Vec.of(0, .2, 3));
-        let fall_tilt = Mat4.rotation(Math.PI*.5, Vec.of(1, 0, 0));
-		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
-    }
-
-    phase_5(t, duration) {
-		if (!this.paused) {
-			//this.control_camera_3(t%duration, duration);
-		}
-		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
-        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
-        let start_y = -20;
-        let end_y = 100;
-        let T = Mat4.translation(Vec.of(0, 0, 100));
+        let T = Mat4.translation(Vec.of(0, 0, 110));
         let tripT = Mat4.translation(Vec.of(0, .2, 3));
         let fall_tilt = Mat4.rotation(Math.PI*.5, Vec.of(1, 0, 0));
 		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
 
-		T = Mat4.translation(Vec.of(0, 104, 0));
-		this.draw_grower(T, t);
+		T = Mat4.translation(Vec.of(0, 118, 0));
+		let s = 3;
+		let S = Mat4.scale(Vec.of(s, s, s));
+		this.draw_grower(T.times(S), t);
     }
+
 
     display(graphics_state) {
         this.gs = graphics_state;
@@ -384,7 +434,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 		
         //draw axes
-        this.play_demo(t);
+        this.play_demo(t-30);
 
     }
 }

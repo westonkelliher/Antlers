@@ -86,10 +86,10 @@ class SavedTrees {
 
 	this.grower = [];
 
-	let ntime = 10;
-	let fps = 5;
+	let ntime = 40;
+	let fps = 10;
 	let start_c = .9;
-	let end_c = .6;
+	let end_c = .35;
 	for (let i = 0; i < ntime*fps; i++) {
 	    this.grower.push(this.get_big_cont_tree(start_c - (start_c-end_c)*i/(ntime*fps)));
 	}
