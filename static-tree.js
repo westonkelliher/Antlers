@@ -27,12 +27,6 @@ class StaticSegment extends StaticPart {
 	this.end_phi = end_phi;
     }
     
-    init(gl, gs, material) {
-	this.material = material;
-	this.gl = gl;
-	this.gs = gs;
-	this.gpu_loaded = false;
-    }
 
     next_matrix(m) {
 	var phi = Mat4.rotation(this.base_phi, Vec.of(0, 1, 0));
@@ -79,37 +73,36 @@ class StaticRule {
 	this.max_size = max_size;
     }
 
-    init(gl, gs, material) {
-	for (let i = 0; i < this.right_hand.length; i++) {
-	    if (this.right_hand[i].to_string() == 'I' || this.right_hand[i].to_string() == 'v') {
-		this.right_hand[i].init(gl, gs, material);
-	    }
-	}
-    }
 
 }
 
 //rules should increase in max_size from left to right
 class StaticTree {
-    constructor(rules) {
+    constructor(rules, leaf_model, leaf_mat, seg_mat) {
 	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
+	this.leaf_model = leaf_model;
+	this.leaf_mat = leaf_mat;
+	this.seg_mat = seg_mat;
     }
     
-    init(gl, gs, material) {
-	for (let i = 0; i < this.rules.length; i++) {
-	    this.rules[i].init(gl, gs, material);
-	}
+    init(gl) {
+	this.gl = gl;
     }
     
 
 
     //Basically we're currying here
     get_model() {
-	return this.private_get_model(1, Mat4.identity());
+	let dat = this.private_get_model(1, Mat4.identity());
+
+	return new ComplexShape(this.gl,
+				[[new MultiShape(dat.segments), this.seg_mat],
+				[new MultiShape(dat.leaves), this.leaf_mat]]);
     }
     
     private_get_model(size, m) {
-	var subshapes = [];
+	var segments = [];
+	var leaves = [];
 	var size_stack = [];
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
@@ -118,10 +111,11 @@ class StaticTree {
 		    var k = this.rules[i].right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
-			subshapes.push([m, k.get_model()]);
+			segments.push([m, k.get_model()]);
 			m = k.next_matrix(m);
 			if (j == this.rules[i].right_hand.length-1) {
-			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			    segments = segments.concat(this.private_get_model(size, m).segments);
+			    leaves = leaves.concat(this.private_get_model(size, m).leaves);
 			}
 		    }
 		    else if (k.to_string() == 'L(') {
@@ -132,21 +126,26 @@ class StaticTree {
 		    }
 		    else if (k.to_string() == ')') {
 			if (size != 0) {
-			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			    segments = segments.concat(this.private_get_model(size, m).segments);
+			    leaves = leaves.concat(this.private_get_model(size, m).leaves);
 			}
 			size = size_stack.pop();
 			m = matrix_stack.pop();
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			let R = Mat4.rotation(k.base_rotation, Vec.of(0, 0, 1));			
-			subshapes.push([m, k.get_model()]);
+			let S = Mat4.scale(Vec.of(4, 4, 4));
+			leaves.push([m, this.leaf_model]);
+			segments.push([m, k.get_model()]);
 		    }
 		}
 		break;
 	    }
 	}
-	return new MultiShape(subshapes);
+	return {
+	    segments: segments,
+	    leaves: leaves
+	};
     }
     
     

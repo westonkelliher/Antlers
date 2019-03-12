@@ -27,13 +27,6 @@ class GrowingSegment extends GrowingPart {
 	this.end_phi = end_phi;
     }
     
-    init(gl, gs, material) {
-	this.material = material;
-	this.gl = gl;
-	this.gs = gs;
-	this.gpu_loaded = false;
-    }
-
     next_matrix(m) {
 	var phi = Mat4.rotation(this.base_phi, Vec.of(0, 1, 0));
         var theta = Mat4.rotation(this.base_theta, Vec.of(0, 0, 1));
@@ -153,14 +146,6 @@ class GrowingRule {
     constructor(max_size, right_hand) {
 	this.right_hand = right_hand; //array of
 	this.max_size = max_size;
-    }
-    
-    init(gl, gs, material) {
-	for (let i = 0; i < this.right_hand.length; i++) {
-	    if (this.right_hand[i].to_string() == 'I' || this.right_hand[i].to_string() == 'v') {
-		this.right_hand[i].init(gl, gs, material);
-	    }
-	}
     }
     
     copy() {
@@ -389,68 +374,32 @@ class GrowingRule {
 
 //rules should increase in max_size from left to right
 class GrowingTree {
-    constructor(rules) {
+    constructor(rules, leaf_model, leaf_mat, seg_mat) {
 	this.rules = rules; //an array of arrays of size two; rules[i][0] should correspond to a max-size and rules[i][1] should correspond to a rule/lefthand
+	this.leaf_model = leaf_model;
+	this.leaf_mat = leaf_mat;
+	this.seg_mat = seg_mat;
     }
-    
-    init(gl, gs, material) {
+
+    init(gl) {
+	this.gl = gl;
 	for (let i = 0; i < this.rules.length; i++) {
-	    this.rules[i].init(gl, gs, material);
 	    if (i != 0) {
 		this.rules[i].make_interpolable(this.rules[i-1]);
 	    }
 	}
     }
     
-    /*draw_tree(size, m) {
-	var size_stack = [];
-	var matrix_stack = [];
-	for (let i = 0; i < this.rules.length; i++) {
-	    if (size <= this.rules[i].max_size) {
-		if (i != 0) {
-		    let rule_depth = (size-this.rules[i-1].max_size)/(this.rules[i].max_size-this.rules[i-1].max_size);
-		}
-		let rule = i == 0 ? this.rules[i] : this.rules[i].interpolable_copy();
-		for (let j = 0; j < rule.right_hand.length; j++) {
-		    var k = rule.right_hand[j];
-		    if (k.to_string() == 'I') {
-			size *= k.end_size;
-			k.draw(m);
-			m = k.next_matrix(m);
-			if (j == rule.right_hand.length-1) {
-			    this.draw_tree(size, m)
-			}
-		    }
-		    else if (k.to_string() == 'L(') {
-			size_stack.push(size);
-			size *= k.size_ratio;
-			matrix_stack.push(m);
-			m = k.next_matrix(m)
-		    }
-		    else if (k.to_string() == ')') {
-			if (size != 0) {
-			    this.draw_tree(size, m)
-			}
-			size = size_stack.pop();
-			m = matrix_stack.pop();
-		    }
-		    else if (k.to_string() == 'v') {
-			size = 0;
-			k.draw(m);
-		    }
-		}
-		break;
-	    }
-	}
-    }
-*/
-    //Basically we're currying here
     get_model() {
-	return this.private_get_model(1, Mat4.identity());
+	let dat = this.private_get_model(1, Mat4.identity());
+	return new ComplexShape(this.gl,
+				[[new MultiShape(dat.segments), this.seg_mat],
+				 [new MultiShape(dat.leaves), this.leaf_mat]]);
     }
     
     private_get_model(size, m) {
-	var subshapes = [];
+	var segments = [];
+	var leaves = [];
 	var size_stack = [];
 	var matrix_stack = [];
 	for (let i = 0; i < this.rules.length; i++) {
@@ -465,10 +414,12 @@ class GrowingTree {
 		    var k = rule.right_hand[j];
 		    if (k.to_string() == 'I') {
 			size *= k.end_size;
-			subshapes.push([m, k.get_model()]);
+			segments.push([m, k.get_model()]);
 			m = k.next_matrix(m);
 			if (j == this.rules[i].right_hand.length-1) {
-			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			    let temret = this.private_get_model(size, m);
+			    segments = segments.concat(temret.segments);
+			    leaves = leaves.concat(temret.leaves);
 			}
 		    }
 		    else if (k.to_string() == 'L(') {
@@ -479,20 +430,27 @@ class GrowingTree {
 		    }
 		    else if (k.to_string() == ')') {
 			if (size != 0) {
-			    subshapes.push([Mat4.identity(), this.private_get_model(size, m)]);
+			    let temret = this.private_get_model(size, m);
+			    segments = segments.concat(temret.segments);
+			    leaves = leaves.concat(temret.leaves);
 			}
 			size = size_stack.pop();
 			m = matrix_stack.pop();
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			subshapes.push([m, k.get_model()]);
+			let S = Mat4.scale(8, 8, 8);
+			leaves.push([m.times(S), this.leaf_model]);
+			segments.push([m, k.get_model()]);
 		    }
 		}
 		break;
 	    }
 	}
-	return new MultiShape(subshapes);
+	return {
+	    segments: segments,
+	    leaves: leaves
+	};
     }
     
     
