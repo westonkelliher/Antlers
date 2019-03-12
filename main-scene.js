@@ -132,12 +132,28 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     play_demo(t) {
         let m = Mat4.identity();
-        
-	this.draw_walk_ups(m);
+
+        let T1 = Mat4.translation(Vec.of(0, -100, 0));
+	this.draw_walk_ups(T1);
+
+	this.draw_grower(m, t%21);
 	
     }
 
 
+    draw_grower(m, t) {
+	let ntime = 10;
+	let fps = 5;
+	if (t < 0 || t > ntime) {
+	    //do nothing
+	    return;
+	}
+	let index = Math.floor(t*fps);
+	let s = Math.sqrt(index)/20;
+	let S = Mat4.scale(Vec.of(s, s, s));
+	this.saved_trees.grower[index].complex_draw(m.times(S), this.gs);
+    }
+    
     draw_walk_ups(m) {
 	let wus = this.saved_trees.walk_up_trees;
 	for (let i = 0; i < wus.length; i++) {

@@ -5,7 +5,7 @@ class SavedTrees {
     constructor(context) {
 	this.gl = context.gl;
 	this.leaf_model_1 = new Leaf(.1, 10);
-	this.light_brown = context.get_instance(Phong_Shader).material(Color.of(.9, .7, .4, 1), {
+	this.light_brown = context.get_instance(Phong_Shader).material(Color.of(.9, .7, .3, 1), {
 	    ambient: .4,
 	    diffusivity: .4,
 	    specularity: .1
@@ -41,10 +41,10 @@ class SavedTrees {
 	this.wu1 = this.get_spike_tree(.97);
 	this.wu2 = this.get_spike_tree(.96);
 	this.wu3 = this.get_spike_tree(.95);
-	this.wu4 = this.get_cont1_tree(.70);
+	this.wu4 = this.get_cont1_tree(.80);
 	this.wu5 = this.get_spike_tree(.94);
-	this.wu6 = this.get_cont1_tree(.69);
-	this.wu7 = this.get_cont1_tree(.67);
+	this.wu6 = this.get_cont1_tree(.75);
+	this.wu7 = this.get_cont1_tree(.70);
 	this.wu8 = this.get_spike_tree(.93);
 	this.wu9 = this.get_spike_tree(.92);
 	this.wu10 = this.get_cont1_tree(.62);
@@ -84,6 +84,15 @@ class SavedTrees {
 
 			     ];
 
+	this.grower = [];
+
+	let ntime = 20;
+	let fps = 10;
+	let start_c = .9;
+	let end_c = .18;
+	for (let i = 0; i < ntime*fps; i++) {
+	    this.grower.push(this.get_big_cont_tree(start_c - (start_c-end_c)*i/(ntime*fps)));
+	}
 	
 	
     }
@@ -169,9 +178,8 @@ class SavedTrees {
         var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
-        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.yellow_green, this.light_brown);
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
         tree_prod.init(this.gl);
-
 	return tree_prod.get_model();
     
     }

@@ -439,9 +439,10 @@ class GrowingTree {
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			let S = Mat4.scale(Vec.of(8, 8, 8));
+			let s = 5;
+			let S = Mat4.scale(Vec.of(s, s, s));
 			leaves.push([m.times(S), this.leaf_model]);
-			S = Mat4.scale(Vec.of(-8, 8, 8));
+			S = Mat4.scale(Vec.of(-1*s, s, s));
 			leaves.push([m.times(S), this.leaf_model]);
 			segments.push([m, k.get_model()]);
 		    }
