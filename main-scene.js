@@ -142,8 +142,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
 
     draw_grower(m, t) {
-	let ntime = 10;
-	let fps = 5;
+	let ntime = 20;
+	let fps = 10;
 	if (t < 0 || t > ntime) {
 	    //do nothing
 	    return;
