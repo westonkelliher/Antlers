@@ -13,7 +13,6 @@ window.ComplexShape = window.classes.ComplexShape = class ComplexShape extends S
 
 
     complex_draw(m, gs) {
-	console.log('drw');
 	for (let i = 0; i < this.subgroups.length; i++) {
 	    this.subgroups[i][0].draw(gs, m, this.subgroups[i][1]);
 	}

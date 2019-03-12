@@ -95,7 +95,6 @@ class StaticTree {
     get_model() {
 	let dat = this.private_get_model(1, Mat4.identity());
 
-	console.log(dat.leaves);
 	return new ComplexShape(this.gl,
 				[[new MultiShape(dat.segments), this.seg_mat],
 				[new MultiShape(dat.leaves), this.leaf_mat]]);
@@ -106,7 +105,6 @@ class StaticTree {
 	var leaves = [];
 	var size_stack = [];
 	var matrix_stack = [];
-	console.log('2');
 	for (let i = 0; i < this.rules.length; i++) {
 	    if (size <= this.rules[i].max_size) {
 		for (let j = 0; j < this.rules[i].right_hand.length; j++) {
@@ -116,7 +114,6 @@ class StaticTree {
 			segments.push([m, k.get_model()]);
 			m = k.next_matrix(m);
 			if (j == this.rules[i].right_hand.length-1) {
-			    console.log('3');
 			    segments = segments.concat(this.private_get_model(size, m).segments);
 			    leaves = leaves.concat(this.private_get_model(size, m).leaves);
 			}
@@ -129,7 +126,6 @@ class StaticTree {
 		    }
 		    else if (k.to_string() == ')') {
 			if (size != 0) {
-			    console.log('4');
 			    segments = segments.concat(this.private_get_model(size, m).segments);
 			    leaves = leaves.concat(this.private_get_model(size, m).leaves);
 			}
@@ -138,8 +134,7 @@ class StaticTree {
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			let T = Mat4.translation(Vec.of(0, 0, 1));
-			console.log('leaf_push'+this.leaf_model);
+			let S = Mat4.scale(Vec.of(4, 4, 4));
 			leaves.push([m, this.leaf_model]);
 			segments.push([m, k.get_model()]);
 		    }
@@ -147,7 +142,6 @@ class StaticTree {
 		break;
 	    }
 	}
-	console.log('ret');
 	return {
 	    segments: segments,
 	    leaves: leaves
