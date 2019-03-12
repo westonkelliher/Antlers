@@ -28,13 +28,18 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
             'ball': new Subdivision_Sphere(4),
-	    'rock': new Rock(1)
+	    	'rock': new Rock(1),
+	    	'apple': new Apple()
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
 
         // Make some Material objects available to you:
-        this.clay = context.get_instance(Phong_Shader).material(Color.of(.9, .5, .9, 1), {
+        this.oranges = context.get_instance(Phong_Shader).material(Color.of(.3, .3, .8, 1), {
+	    	ambient: .4,
+	    	diffusivity: .4
+		});
+        this.clay = context.get_instance(Phong_Shader).material(Color.of(.75, .55, .45, 1), {
             ambient: .4,
             diffusivity: .4
         });
@@ -62,7 +67,10 @@ class Assignment_Two_Skeleton extends Scene_Component {
             pyramid: "assets/tetrahedron-texture2.png",
             simplebox: "assets/tetrahedron-texture2.png",
             cone: "assets/hypnosis.jpg",
-            circle: "assets/hypnosis.jpg"
+            circle: "assets/hypnosis.jpg",
+	    	head: "assets/head.jpg",
+            body: "assets/body.png",
+            arms: "assets/arms.png"
         };
         for (let t in shape_textures)
             this.shape_materials[t] = this.texture_base.override({
@@ -84,72 +92,107 @@ class Assignment_Two_Skeleton extends Scene_Component {
         });
     }
 
-    draw_axes(distance) {
-        var T; var R; var S; var M;
-        //draw axis cubes                                                                                                                                                        
-        T = Mat4.translation( Vec.of( 0, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // center 
-        T = Mat4.translation( Vec.of( distance, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .5, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +x                                                                                    
-        T = Mat4.translation( Vec.of( -distance, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .5, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -x                                                                               
-        T = Mat4.translation( Vec.of( 0, distance, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .5, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +y                                                                                  
-        T = Mat4.translation( Vec.of( 0, -distance, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .5, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -y                                                                             
-        T = Mat4.translation( Vec.of( 0, 0, distance ) );
-        S = Mat4.scale( Vec.of( .1, .1, .5 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +z                                                                                   
-        T = Mat4.translation( Vec.of( 0, 0, -distance ) );
-        S = Mat4.scale( Vec.of( .1, .1, .5 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -z                                                                              
-    }
 
+	create_person(m,t, stiff){
+        var T; var R; var S; var Body; var T1; var T2;
+
+        let torsoHeight = .6;
+        let legHeight = .6;
+        let bodyHeight = legHeight + torsoHeight;
+
+        let headRadius = .5;
+        let bodyRadius = .5;
+
+		let leg_speed = 4;
+
+		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
+        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+
+        //Legs
+        if (stiff == undefined){
+        var Legs;
+        T1 = Mat4.translation(Vec.of(-bodyRadius/2,-torsoHeight,0));
+        T2 = Mat4.translation(Vec.of(0,2*torsoHeight,0));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(t*leg_speed), Vec.of(1,0,0));
+        Legs = m.times(T2).times(R).times(T1).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+
+		T1 = Mat4.translation(Vec.of(bodyRadius/2,-torsoHeight,0));
+        T2 = Mat4.translation(Vec.of(0,2*torsoHeight,0));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(-t*leg_speed), Vec.of(1,0,0));
+
+        Legs = m.times(T2).times(R).times(T1).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+        }
+        else {
+        	T1 = Mat4.translation(Vec.of(-bodyRadius/2,-torsoHeight,0));
+        T2 = Mat4.translation(Vec.of(0,2*torsoHeight,0));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight,bodyRadius/2));
+        Legs = m.times(T2).times(T1).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+
+		T1 = Mat4.translation(Vec.of(bodyRadius/2,-torsoHeight,0));
+        T2 = Mat4.translation(Vec.of(0,2*torsoHeight,0));
+        R = Mat4.rotation(Math.sin(-t*leg_speed), Vec.of(1,0,0));
+
+        Legs = m.times(T2).times(T1).times(S);
+        this.shapes['box'].draw(this.gs, Legs,this.oranges);
+        }
+
+        //Torso
+        var Torso;
+        T = Mat4.translation(Vec.of(0,0 + torsoHeight + legHeight * 2,0));
+        S = Mat4.scale(Vec.of(bodyRadius,torsoHeight,bodyRadius/2));
+        R = Mat4.rotation(Math.PI/2, Vec.of(0,0,1));
+
+        Torso = m.times(T).times(S).times(R);
+        this.shapes['box'].draw(this.gs, Torso,this.shape_materials['body']);
+
+        //Arms
+        var Arms;
+        T = Mat4.translation(Vec.of(0 + bodyRadius + bodyRadius/2,0 + torsoHeight + legHeight * 4 -.1,0));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight*1.4,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(t), Vec.of(1,0,0));
+
+        Arms = m.times(T).times(S);
+        this.shapes['box'].draw(this.gs, Arms,this.plastic);
+
+        T = Mat4.translation(Vec.of(0 - (bodyRadius + bodyRadius/2),0 + torsoHeight + legHeight * 4 -.1,0));
+        S = Mat4.scale(Vec.of(bodyRadius/2,torsoHeight*1.4,bodyRadius/2));
+        R = Mat4.rotation(Math.sin(-t), Vec.of(1,0,0));
+        Arms = m.times(T).times(S);
+        this.shapes['box'].draw(this.gs, Arms,this.plastic);
+
+
+        //Head
+        var Head;
+        S = Mat4.scale(Vec.of(headRadius,headRadius,headRadius - .1));
+        R = Mat4.rotation(Math.PI/2, Vec.of(0,0,1));
+        T = Mat4.translation(Vec.of(0,0 + torsoHeight * 2 + legHeight * 2 + headRadius,0));
+        Head = m.times(T).times(S).times(R);
+        this.shapes['box'].draw(this.gs, Head,this.shape_materials['head']);
+    
+
+
+    }
 
     initialize_demo() {
 
         this.saved_trees = new SavedTrees(this.cont);
     }
 
-    play_demo(t) {
-        let m = Mat4.identity();
-
-        let T1 = Mat4.translation(Vec.of(0, -100, 0));
-	this.draw_walk_ups(T1);
-
-	this.draw_grower(m, t%21);
-	
-    }
-
-
+    
     draw_grower(m, t) {
-	let ntime = 20;
-	let fps = 10;
+	let ntime = 10;
+	let fps = 5;
 	if (t < 0 || t > ntime) {
 	    //do nothing
 	    return;
 	}
 	let index = Math.floor(t*fps);
-	let s = Math.sqrt(index)/80 + index/800;
+	let s = Math.sqrt(index)/200 + index/2000;
 	let S = Mat4.scale(Vec.of(s, s, s));
 	this.saved_trees.grower[index].complex_draw(m.times(S), this.gs);
     }
@@ -160,14 +203,175 @@ class Assignment_Two_Skeleton extends Scene_Component {
 	    let R = Mat4.rotation(4*i, Vec.of(0, 0, 1));
 	    let s = .6;
 	    let S = Mat4.scale(Vec.of(wus[i][0]*s, wus[i][0]*s, wus[i][0]*s));
-	    let T = Mat4.translation(Vec.of(wus[i][1]*4+(1-2*(i%2))*15, wus[i][2]*2+i*6, 0));
+	    let T = Mat4.translation(Vec.of(wus[i][1]*4+(1-2*(i%2))*10, wus[i][2]*2+i*6, 0));
 	    let M = m.times(T).times(R).times(S);
 	    wus[i][3].complex_draw(M, this.gs);
 	}
 	
     }
 
-    
+    draw_grass(m, x, y) {
+	for(let i = -x; i <= x; i++){
+	    for(var j = -y; j <= y; j++){
+                let T = Mat4.translation(Vec.of(i*2, j*2, 0))
+                let M = m.times(T);
+                this.shapes['square'].draw(this.gs, M,this.shape_materials['square']);
+	    }	
+        }
+    }
+
+	reset_cam() {
+		this.gs.camera_transform = Mat4.identity();
+		this.cam_mult(Mat4.rotation(Math.PI*.5, Vec.of(-1, 0, 0)));
+	}
+	cam_mult(m) {
+		this.gs.camera_transform = this.gs.camera_transform.times(m);
+	}
+
+	from_to(start, end, t, duration) {
+		console.log(t/duration);
+		return start+(end-start)*(t/duration);
+	}
+
+	control_camera_1(t, duration) {
+		let start_height = .2;
+		let end_height = 1;
+		let start_dist = 1;
+		let end_dist = 3;
+		let start_theta = Math.PI*1/2;
+		let end_theta = Math.PI*3/2;
+		let start_look = Vec.of(-10, 0, 0);
+		let T = Mat4.translation(start_look);
+		let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
+				-1*this.from_to(start_height, end_height, t, duration)));
+		let Theta = Mat4.rotation(this.from_to(start_theta, end_theta, t, duration), Vec.of(0,0,1));
+		this.reset_cam();
+		this.cam_mult(Dist);
+		this.cam_mult(Theta);
+		this.cam_mult(T);
+	}
+
+	control_camera_2(t, duration) {
+		let start_height = 1;
+		let end_height = 4;
+		let start_dist = 13;
+		let end_dist = 15;
+		let start_theta = Math.PI*3/2;
+		let end_theta = Math.PI*5/2;
+		let start_y = 0;
+		let end_y = -100;
+		let start_look = Vec.of(0, 0, 0);
+		let T = Mat4.translation(start_look);
+		let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
+				-1*this.from_to(start_height, end_height, t, duration)));
+		let Theta = Mat4.rotation(this.from_to(start_theta, end_theta, t, duration), Vec.of(0,0,1));
+		let runT = Mat4.translation(Vec.of(0, this.from_to(start_y, end_y, t, duration), 0));
+		this.reset_cam();
+		this.cam_mult(Dist);
+		this.cam_mult(Theta);
+		this.cam_mult(T);
+		this.cam_mult(runT);
+	}
+
+    play_demo(t) {
+        let m = Mat4.identity();
+
+		let d1 = 2;
+		let d2 = 2;
+        let d3 = .3;
+        let d4 = 1;
+        let d5 = 10;
+        if (t < d1) {
+        	this.phase_1(t, d1);
+        }
+        else if (t < d1+d2){
+        	this.phase_2(t-d1, d2);
+        }
+        else if (t < d1+d2+d3) {
+			this.phase_3(t-d1-d2, d3);
+        }
+        else if (t < d1+d2+d3+d4) {
+			this.phase_4(t-d1-d2-d3, d4);
+        }
+        else if (t < d1+d2+d3+d4+d5) {
+			this.phase_5(t-d1-d2-d3-d4, d5);
+        }
+
+		let S = Mat4.scale(Vec.of(3, 3, 1));
+		let T = Mat4.translation(Vec.of(0, 60, 0));
+		this.draw_grass(m.times(T).times(S), 5, 15);
+	
+        let T1 = Mat4.translation(Vec.of(0, 0, 0));
+		this.draw_walk_ups(T1);
+
+		//this.draw_grower(m, t%20);
+	
+    }
+
+    phase_1(t, duration) {
+		if (!this.paused) {
+			this.control_camera_1(t%duration, duration);
+		}
+    }
+
+	phase_2(t, duration) {
+		let wait = duration/6;
+		if (!this.paused && t > wait) {
+			this.control_camera_2((t-wait)%(duration-wait), (duration-wait));
+		}
+		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
+        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+        let start_y = -20;
+        let end_y = 100;
+        let runT = Mat4.translation(Vec.of(0, 0, this.from_to(start_y, end_y, t, duration)));
+		this.create_person(theta.times(tilt).times(runT), t);
+	}
+
+	phase_3(t, duration) {
+		if (!this.paused) {
+			//this.control_camera_3(t%duration, duration);
+		}
+		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
+        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+        let start_y = -20;
+        let end_y = 100;
+        let T = Mat4.translation(Vec.of(0, 0, 100));
+        let tripT = Mat4.translation(Vec.of(0, .2*t/duration, 3*t/duration));
+        let fall_tilt = Mat4.rotation(Math.PI*.5*t/duration, Vec.of(1, 0, 0));
+		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
+    }
+
+    phase_4(t, duration) {
+		if (!this.paused) {
+			//this.control_camera_3(t%duration, duration);
+		}
+		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
+        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+        let start_y = -20;
+        let end_y = 100;
+        let T = Mat4.translation(Vec.of(0, 0, 100));
+        let tripT = Mat4.translation(Vec.of(0, .2, 3));
+        let fall_tilt = Mat4.rotation(Math.PI*.5, Vec.of(1, 0, 0));
+		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
+    }
+
+    phase_5(t, duration) {
+		if (!this.paused) {
+			//this.control_camera_3(t%duration, duration);
+		}
+		let tilt = Mat4.rotation(Math.PI*1/2, Vec.of(1, 0, 0));
+        let theta = Mat4.rotation(Math.PI, Vec.of(0, 0, 1));
+        let start_y = -20;
+        let end_y = 100;
+        let T = Mat4.translation(Vec.of(0, 0, 100));
+        let tripT = Mat4.translation(Vec.of(0, .2, 3));
+        let fall_tilt = Mat4.rotation(Math.PI*.5, Vec.of(1, 0, 0));
+		this.create_person(theta.times(tilt).times(T).times(tripT).times(fall_tilt), t, true);
+
+		T = Mat4.translation(Vec.of(0, 104, 0));
+		this.draw_grower(T, t);
+    }
+
     display(graphics_state) {
         this.gs = graphics_state;
         // Use the lights stored in this.lights.
@@ -178,8 +382,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             this.t += graphics_state.animation_delta_time / 1000;
         const t = this.t;
 
+		
         //draw axes
-        this.draw_axes(12);
         this.play_demo(t);
 
     }

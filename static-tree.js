@@ -134,9 +134,9 @@ class StaticTree {
 		    }
 		    else if (k.to_string() == 'v') {
 			size = 0;
-			let S = Mat4.scale(Vec.of(4, 4, 4));
+			let S = Mat4.scale(Vec.of(2, 2, 2));
 			leaves.push([m.times(S), this.leaf_model]);
-			S = Mat4.scale(Vec.of(-4, 4, 4));
+			S = Mat4.scale(Vec.of(-2, 2, 2));
 			leaves.push([m.times(S), this.leaf_model]);
 			segments.push([m, k.get_model()]);
 		    }
