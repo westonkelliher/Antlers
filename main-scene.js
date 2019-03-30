@@ -27,13 +27,19 @@ class Assignment_Two_Skeleton extends Scene_Component {
             'box': new Cube(),
             'cylinder': new Cylinder(15),
             'cone': new Cone(20),
-            'ball': new Subdivision_Sphere(4)
+            'ball': new Subdivision_Sphere(4),
+	    	'rock': new Rock(1),
+	    	'apple': new Apple()
         }
         this.submit_shapes(context, shapes);
         this.shape_count = Object.keys(shapes).length;
 
         // Make some Material objects available to you:
-        this.clay = context.get_instance(Phong_Shader).material(Color.of(.9, .5, .9, 1), {
+        this.oranges = context.get_instance(Phong_Shader).material(Color.of(.3, .3, .8, 1), {
+	    	ambient: .4,
+	    	diffusivity: .4
+		});
+        this.clay = context.get_instance(Phong_Shader).material(Color.of(.75, .55, .45, 1), {
             ambient: .4,
             diffusivity: .4
         });
@@ -50,18 +56,16 @@ class Assignment_Two_Skeleton extends Scene_Component {
             diffusivity: .45,
             specularity: .1
         });
+        this.red = context.get_instance(Phong_Shader).material(Color.of(.9, .3, .2, 1), {
+            ambient: .4,
+            diffusivity: .45,
+            specularity: .1
+        });
 
         // Load some textures for the demo shapes
         this.shape_materials = {};
         const shape_textures = {
-            square: "assets/butterfly.png",
-            box: "assets/even-dice-cubemap.png",
-            ball: "assets/soccer_sph_s_resize.png",
-            cylinder: "assets/treebark.png",
-            pyramid: "assets/tetrahedron-texture2.png",
-            simplebox: "assets/tetrahedron-texture2.png",
-            cone: "assets/hypnosis.jpg",
-            circle: "assets/hypnosis.jpg"
+
         };
         for (let t in shape_textures)
             this.shape_materials[t] = this.texture_base.override({
@@ -83,50 +87,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
         });
     }
 
-    draw_axes(distance) {
-        var T; var R; var S; var M;
-        //draw axis cubes                                                                                                                                                        
-        T = Mat4.translation( Vec.of( 0, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // center 
-        T = Mat4.translation( Vec.of( distance, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .5, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +x                                                                                    
-        T = Mat4.translation( Vec.of( -distance, 0, 0 ) );
-        S = Mat4.scale( Vec.of( .5, .1, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -x                                                                               
-        T = Mat4.translation( Vec.of( 0, distance, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .5, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +y                                                                                  
-        T = Mat4.translation( Vec.of( 0, -distance, 0 ) );
-        S = Mat4.scale( Vec.of( .1, .5, .1 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -y                                                                             
-        T = Mat4.translation( Vec.of( 0, 0, distance ) );
-        S = Mat4.scale( Vec.of( .1, .1, .5 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // +z                                                                                   
-        T = Mat4.translation( Vec.of( 0, 0, -distance ) );
-        S = Mat4.scale( Vec.of( .1, .1, .5 ) );
-        M = Mat4.identity();
-        M = M.times( T ).times( S );
-        this.shapes.box.draw(this.gs, M, this.plastic); // -z                                                                              
-    }
-
 
     initialize_demo() {
-
-        this.saved_trees = new SavedTrees(this.cont.gl, this.gs );
+        this.saved_trees = new SavedTrees(this.cont);
 
         this.saved_trees.spike_tree_1.copy_onto_graphics_card(this.cont.gl);
         this.saved_trees.spike_tree_2.copy_onto_graphics_card(this.cont.gl);
@@ -155,62 +118,49 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
     }
 
-    play_demo(t) {
-        let m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
-        
-        let T = Mat4.translation(Vec.of(50, 0, 0));
-        
-        this.saved_trees.spike_tree_1.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_2.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_3.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_4.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_5.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_6.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.spike_tree_7.draw(this.gs, m, this.bone);
+    
 
-        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.5, .5, .5));
-        m = m.times(Mat4.translation(Vec.of(0, 30, 0)));
-        T = Mat4.translation(Vec.of(25, 0, 0));
+
+    play_demo(t) {
+        let m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.0625, .0625, .0625));
         
-        this.saved_trees.cont_tree_1.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_2.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_3.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_4.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_5.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_6.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.cont_tree_7.draw(this.gs, m, this.bone);
+        let T = Mat4.translation(Vec.of(200, 0, 0));
+	let s = 1.6;
+	let S = Mat4.scale(Vec.of(s, s, s));
+        this.saved_trees.spike_tree_1.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.spike_tree_3.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.spike_tree_5.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.spike_tree_7.complex_draw(m, this.gs);
 
         m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
-        m = m.times(Mat4.translation(Vec.of(0, 100, 0)));
+        m = m.times(Mat4.translation(Vec.of(0, 60, 0)));
         T = Mat4.translation(Vec.of(50, 0, 0));
         
-        this.saved_trees.big_cont_tree_1.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_2.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_3.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_4.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_5.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_6.draw(this.gs, m, this.bone);
-        m = m.times(T);
-        this.saved_trees.big_cont_tree_7.draw(this.gs, m, this.bone);
-    }
+        this.saved_trees.cont_tree_1.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.cont_tree_3.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.cont_tree_5.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.cont_tree_7.complex_draw(m, this.gs);
 
+        m = Mat4.rotation(-Math.PI*.5, Vec.of(1, 0, 0)).times(Mat4.scale(.25, .25, .25));
+        m = m.times(Mat4.translation(Vec.of(0, 160, 0)));
+        T = Mat4.translation(Vec.of(50, 0, 0));
+        
+        this.saved_trees.big_cont_tree_1.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.big_cont_tree_3.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.big_cont_tree_5.complex_draw(m, this.gs);
+        m = m.times(T).times(S);
+        this.saved_trees.big_cont_tree_7.complex_draw(m, this.gs);
+   
+	
+    }
 
     display(graphics_state) {
         this.gs = graphics_state;
@@ -222,8 +172,8 @@ class Assignment_Two_Skeleton extends Scene_Component {
             this.t += graphics_state.animation_delta_time / 1000;
         const t = this.t;
 
-        //draw axes
-        this.draw_axes(12);
+		
+
         this.play_demo(t);
 
     }
