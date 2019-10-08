@@ -179,30 +179,36 @@ window.Rock = window.classes.Rock = class Rock extends Shape {
 
 window.Apple = window.classes.Apple = class Apple extends Shape{
     constructor() {
-        super("positions", "normals", "texture_coords");
-        let p = 10;
-        let n = 12;
-        let peel = 0.1;
+        super("positions", "normals");
 
-        var m = Mat4.identity();
-        
+        var m = Mat4.rotation(0*Math.PI, Vec.of(0, 0, 1));
+        let p = 20;
+        let n = 12;
+        let peel = 0.5
+
         this.positions.push([0, 0, 0]);
         this.normals.push([0, 0, -1]);
-        for (let j = 0; j < p; j++){
-            
+        for (let j = 0; j < m; j++){
+            if (j < p*2/3){
+                peel = peel +0.1;
+             }
+             else{
+             peel = peel -0.1;
+             }
+            for(let i = 0; i < n; i++){
+            this.positions.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j, 1)).to3());
+            this.normals.push(m.times(Vec.of(peel*Math.cos(Math.PI*2*i/n), peel*Math.sin(Math.PI*2*i/n), j, 1)).to3());
         }
 
-	
-        this.positions.push(m.times(Vec.of(0, 0, 0, 1)).to3() );
-        this.normals.push(m.times(Vec.of(0, 0, 1, 0)).to3() );
-	
         for (let k = 0; k < p*n; k++){
-            this.indices.push(k+1, k == p*n-1 ? 1 : k+2, p*n+1);
+            this.indices.push(k+1, i == p*n-1 ? 1 : i+2, p*n+1);
         }
+
+        }
+
 
     }
-        
-        
+
 }
 
 
@@ -307,12 +313,12 @@ window.Cube = window.classes.Cube = class Cube extends Shape {
         ));
 
         this.texture_coords.push(...Vec.cast(
-            [0,    2/3], [0.25, 2/3], [0,    1/3], [0.25, 1/3],
-            [0.5,  2/3], [0.5,  1/3], [0.75, 2/3], [0.75, 1/3],
-            [0.75, 2/3], [0.75, 1/3], [1,    2/3], [1,    1/3],
-            [0.25, 2/3], [0.25, 1/3], [0.5,  2/3], [0.5,  1/3],
-            [0.25, 2/3], [0.5,  2/3], [0.25, 1  ], [0.5,  1  ],
-            [0.25, 1/3], [0.5,  1/3], [0.25, 0  ], [0.5,  0  ]
+            [1/3,  1/3], [1/3,  2/3], [2/3, 1/3], [2/3, 2/3],
+            [1/3,  0], [1/3,  1/3], [2/3, 0], [2/3, 1/3],
+            [2/3, 0], [2/3, 1/3], [1,    0], [1,    1/3],
+            [0,    0], [0, 1/3], [1/3,    0], [1/3, 1/3],
+            [1/3,  1/3], [1/3,  2/3], [2/3, 1/3], [2/3, 2/3],
+            [1/3,  1/3], [1/3,  2/3], [2/3, 1/3], [2/3, 2/3]
         )); 
 
         this.normals.push(...Vec.cast(

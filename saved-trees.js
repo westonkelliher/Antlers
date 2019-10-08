@@ -10,7 +10,7 @@ class SavedTrees {
 	    diffusivity: .4,
 	    specularity: .1
 	});
-	this.dark_brown = context.get_instance(Phong_Shader).material(Color.of(.5, .3, .0, 1), {
+	this.dark_brown = context.get_instance(Phong_Shader).material(Color.of(.4, .2, .0, 1), {
 	    ambient: .4,
 	    diffusivity: .4,
 	    specularity: .1
@@ -20,12 +20,12 @@ class SavedTrees {
 	    diffusivity: .4,
 	    specularity: .3
 	});
-	this.dark_green = context.get_instance(Phong_Shader).material(Color.of(.0, .35, .05, 1), {
+	this.dark_green = context.get_instance(Phong_Shader).material(Color.of(.05, .45, .15, 1), {
 	    ambient: .4,
 	    diffusivity: .4,
 	    specularity: .3
 	});
-	this.yellow_green = context.get_instance(Phong_Shader).material(Color.of(.6, .85, .2, 1), {
+	this.yellow_green = context.get_instance(Phong_Shader).material(Color.of(.7, .8, .2, 1), {
 	    ambient: .4,
 	    diffusivity: .4,
 	    specularity: .3
@@ -86,13 +86,13 @@ class SavedTrees {
 
 	this.grower = [];
 
-	let ntime = 20;
-	let fps = 10;
+	/*let ntime = 20;
+	let fps = 5;
 	let start_c = .9;
-	let end_c = .4;
+	let end_c = .7;
 	for (let i = 0; i < ntime*fps; i++) {
 	    this.grower.push(this.get_big_cont_tree(start_c - (start_c-end_c)*i/(ntime*fps)));
-	}
+	}*/
 	
 	
     }
@@ -125,7 +125,7 @@ class SavedTrees {
         let ruleD = new StaticRule(b_c*b_c*.6, [segC1, segC2, spike0]);
         let ruleE = new StaticRule(b_c*b_c, [branchA2, segA2, end, segA1, segA3]);
 
-        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA], this.leaf_model_1, this.dark_green, this.dark_brown);
+        let tree_prod = new StaticTree([ruleD, ruleE, ruleC, ruleA], this.leaf_model_1, this.yellow_green, this.light_brown);
 		tree_prod.init(this.gl);
 	return tree_prod.get_model();
     }
@@ -150,7 +150,7 @@ class SavedTrees {
         var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
         var ruleC = new GrowingRule(b_c*b_c, [seg4, spike2]);
 
-        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.yellow_green, this.light_brown);
+        var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.dark_green, this.dark_brown);
         tree_prod.init(this.gl);
 
 	return tree_prod.get_model();
@@ -164,19 +164,23 @@ class SavedTrees {
         var seg0 = new GrowingSegment(0, 0, 0, 1, 0 ,0);
         var branch0 = new GrowingBranch(0, 0, 0);
         var spike1 = new GrowingSegment(6, 0, 0, 0, 0, 0);
-        var spike2 = new GrowingSegment(10, 0, 0, 0, 0, 0);
+        var spike2 = new GrowingSegment(8, 0, 0, 0, 0, 0);
 
-        var seg1 = new GrowingSegment(6, Math.PI*0, Math.PI*-.15, .92, -Math.PI*0, Math.PI*0);
-        var seg2 = new GrowingSegment(6, Math.PI*0, Math.PI*0, .92, Math.PI*0, -Math.PI*0);
+        var seg1 = new GrowingSegment(5, Math.PI*0, Math.PI*-.15, .92, -Math.PI*0, -Math.PI*.01);
+        var seg2 = new GrowingSegment(5, Math.PI*0, Math.PI*0, .92, Math.PI*0, Math.PI*.01);
         var seg3 = new GrowingSegment(6, -Math.PI*.7, Math.PI*.05, .92, Math.PI*0, Math.PI*.2);
         var seg4 = new GrowingSegment(9, Math.PI*.2, -Math.PI*.05, .6, Math.PI*0, Math.PI*0);
 
         var branch1 = new GrowingBranch(3, Math.PI*.9, .8);
         var branch3 = new GrowingBranch(3, Math.PI*0, .6);
 
+        var seg1b = new GrowingSegment(6, Math.PI*.1, Math.PI*-.12, .9, -Math.PI*0, Math.PI*.01);
+        var seg2b = new GrowingSegment(6, -Math.PI*.1, Math.PI*.03, .9, Math.PI*.05, -Math.PI*.01);
+        var seg3b = new GrowingSegment(6, -Math.PI*.75, Math.PI*.05, .92, -Math.PI*.05, Math.PI*.2);
+
         var ruleA = new GrowingRule(1, [branch1, seg1, end, seg2, branch3, end, seg3]);
-        var ruleB = new GrowingRule(b_c, [branch1, seg1, end, seg2, seg3])
-        var ruleC = new GrowingRule(b_c*b_c, [branch1, spike2, end, seg4, spike1]);
+        var ruleB = new GrowingRule(b_c, [branch1, seg1b, end, seg2b, seg3b])
+        var ruleC = new GrowingRule(b_c*b_c, [branch1, spike1, end, seg4, spike2]);
 
         var tree_prod = new GrowingTree([ruleC, ruleB, ruleA], this.leaf_model_1, this.light_green, this.light_brown);
         tree_prod.init(this.gl);
