@@ -137,7 +137,12 @@ class Assignment_Two_Skeleton extends Scene_Component {
 	// this.draw_walk_ups(T1); // no static trees for this demo
 
 	this.draw_grower(m, t%21);
-	
+
+	// camera control
+	let duration = 21;
+	if (!this.paused) {
+	    this.control_camera_1(t%duration, duration)
+	}
     }
 
 
@@ -167,6 +172,34 @@ class Assignment_Two_Skeleton extends Scene_Component {
 	
     }
 
+
+    reset_cam() {
+	this.gs.camera_transform = Mat4.identity();
+	this.cam_mult(Mat4.rotation(Math.PI*.5, Vec.of(-1, 0, 0)));
+    }
+    cam_mult(m) {
+	this.gs.camera_transform = this.gs.camera_transform.times(m);
+    }
+    from_to(start, end, t, duration) {
+	return start+(end-start)*(t/duration);
+    }
+    control_camera_1(t, duration) {
+        let start_height = 1;
+        let end_height = 10;
+        let start_dist = 4;
+        let end_dist = 27;
+        let start_theta = Math.PI*3/2;
+        let end_theta = Math.PI*2/2;
+        let start_look = Vec.of(0, 0, 0);
+        let T = Mat4.translation(start_look);
+        let Dist = Mat4.translation(Vec.of(0, this.from_to(start_dist, end_dist, t, duration),
+					   -1*this.from_to(start_height, end_height, t, duration)));
+        let Theta = Mat4.rotation(this.from_to(start_theta, end_theta, t, duration), Vec.of(0,0,1));
+        this.reset_cam();
+        this.cam_mult(Dist);
+        this.cam_mult(Theta);
+        this.cam_mult(T);
+    }
     
     display(graphics_state) {
         this.gs = graphics_state;
