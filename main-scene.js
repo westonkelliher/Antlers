@@ -134,7 +134,7 @@ class Assignment_Two_Skeleton extends Scene_Component {
         let m = Mat4.identity();
 
         let T1 = Mat4.translation(Vec.of(0, -100, 0));
-	this.draw_walk_ups(T1);
+	// this.draw_walk_ups(T1); // no static trees for this demo
 
 	this.draw_grower(m, t%21);
 	
@@ -180,7 +180,9 @@ class Assignment_Two_Skeleton extends Scene_Component {
 
         //draw axes
         this.draw_axes(12);
-        this.play_demo(t);
+
+	// draw tree
+	this.play_demo(t);
 
     }
 }

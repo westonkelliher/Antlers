@@ -31,7 +31,8 @@ class SavedTrees {
 	    specularity: .3
 	});
 
-	this.spike_tree_1 = this.get_spike_tree(.95);
+	// not using static trees
+	/*this.spike_tree_1 = this.get_spike_tree(.95);
 
 	
 	this.spike_tree_2 = this.get_spike_tree(.9);
@@ -80,9 +81,8 @@ class SavedTrees {
 			      [.31, -.9, -.8, this.wu18],
 			      [.24, .4, .7, this.wu19],
 			      [.25, .5, .2, this.wu20],
-			      
-
 			     ];
+	*/
 
 	this.grower = [];
 
